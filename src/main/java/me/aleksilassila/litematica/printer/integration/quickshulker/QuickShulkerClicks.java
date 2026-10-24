@@ -29,6 +29,7 @@ public final class QuickShulkerClicks {
     }
 
     private static void send(AbstractContainerMenu menu, int stateId, int slot, int button, ContainerInput type) {
+        //#if MC >= 11700
         var connection = Minecraft.getInstance().getConnection();
         if (connection == null) return;
         //#if MC >= 12105
@@ -38,6 +39,9 @@ public final class QuickShulkerClicks {
         //#else
         //$$ connection.send(new ServerboundContainerClickPacket(menu.containerId, stateId,
         //$$         slot, button, type, menu.getCarried().copy(), new Int2ObjectOpenHashMap<>()));
+        //#endif
+        //#else
+        //$$ me.aleksilassila.litematica.printer.compat.legacy.LegacyMenuProtocol.send(menu, slot, button, type);
         //#endif
     }
 }

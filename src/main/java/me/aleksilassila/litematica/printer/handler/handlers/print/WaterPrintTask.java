@@ -353,8 +353,10 @@ public final class WaterPrintTask implements PrintTask {
     private static boolean canIceBecomeWaterSource(ClientLevel level, BlockPos pos) {
         //#if MC >= 12111
         if (level.environmentAttributes().getValue(EnvironmentAttributes.WATER_EVAPORATES, pos)) {
-        //#else
+        //#elseif MC >= 11600
         //$$ if (level.dimensionType().ultraWarm()) {
+        //#else
+        //$$ if (level.getDimension().isUltraWarm()) {
         //#endif
             return false;
         }
@@ -417,10 +419,16 @@ public final class WaterPrintTask implements PrintTask {
             // A stair or slab lies within its cell. Resolve its exact shape only if an entity occupies the cell.
             if (unobstructed(context, Blocks.ICE.defaultBlockState())) return true;
             // Both vanilla blocks only read the face and fractional hit Y. Rotation changes horizontal offsets only.
-            Vec3 hit = protocolHit != null ? protocolHit : Vec3.atCenterOf(context.blockPos)
+            Vec3 hit = protocolHit != null ? protocolHit
+                    : me.aleksilassila.litematica.printer.utils.minecraft.Vec3Utils.atCenterOf(context.blockPos)
                     .add(0, action.getSides().get(side).y * 0.5, 0);
+            //#if MC >= 11600
             var placement = new BlockPlaceContext(player, InteractionHand.MAIN_HAND, items[0].getDefaultInstance(),
                     new BlockHitResult(hit, side.getOpposite(), context.blockPos, false)) {
+            //#else
+            //$$ var placement = new BlockPlaceContext(context.level, player, InteractionHand.MAIN_HAND, items[0].getDefaultInstance(),
+            //$$         new BlockHitResult(hit, side.getOpposite(), context.blockPos, false)) {
+            //#endif
                 @Override public Direction getHorizontalDirection() {
                     return action.getPlayerLook() == null ? super.getHorizontalDirection()
                             : Direction.fromYRot(action.getPlayerLook().yaw);

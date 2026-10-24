@@ -1,3 +1,4 @@
+//#if MC >= 11802
 package me.aleksilassila.litematica.printer.guide.guides;
 
 import me.aleksilassila.litematica.printer.enums.BlockMatchResult;
@@ -42,3 +43,4 @@ public class CrafterGuide extends Guide {
         return Result.SKIP;
     }
 }
+//#endif

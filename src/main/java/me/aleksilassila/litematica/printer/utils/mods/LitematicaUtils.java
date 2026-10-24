@@ -11,6 +11,7 @@ import fi.dy.masa.litematica.util.EasyPlaceProtocol;
 import fi.dy.masa.litematica.util.PlacementHandler;
 import me.aleksilassila.litematica.printer.config.Configs;
 import me.aleksilassila.litematica.printer.printer.PrinterBox;
+import me.aleksilassila.litematica.printer.utils.minecraft.Vec3Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
@@ -35,7 +36,7 @@ public class LitematicaUtils {
     public static Vec3 usePrecisionPlacement(BlockPos pos, BlockState stateSchematic) {
         if (Configs.Print.EASY_PLACE_PROTOCOL.getBooleanValue()) {
             EasyPlaceProtocol protocol = PlacementHandler.getEffectiveProtocolVersion();
-            Vec3 hitPos = Vec3.atLowerCornerOf(pos);
+            Vec3 hitPos = Vec3Utils.atLowerCornerOf(pos);
             if (protocol == EasyPlaceProtocol.V3) {
                 //#if MC > 260100
                 //$$ return fi.dy.masa.litematica.util.EasyPlaceUtils.applyPlacementProtocolV3(pos, stateSchematic, hitPos);

@@ -17,6 +17,7 @@ import me.aleksilassila.litematica.printer.utils.minecraft.DirectionUtils;
 import me.aleksilassila.litematica.printer.utils.InventoryUtils;
 import me.aleksilassila.litematica.printer.utils.VoidWarehouseTriggerItem;
 import me.aleksilassila.litematica.printer.utils.minecraft.NetworkUtils;
+import me.aleksilassila.litematica.printer.utils.minecraft.Vec3Utils;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -239,8 +240,8 @@ public class ActionManager {
         } else {
             direction = DirectionUtils.getHorizontalDirection(look.yaw);
         }
-        Vec3 targetCenter = Vec3.atCenterOf(click.target);
-        Vec3 sideOffset = Vec3.atLowerCornerOf(DirectionUtils.getVector(click.side)).scale(0.5);
+        Vec3 targetCenter = Vec3Utils.atCenterOf(click.target);
+        Vec3 sideOffset = Vec3Utils.atLowerCornerOf(DirectionUtils.getVector(click.side)).scale(0.5);
         Vec3 rotatedHitModifier = click.physicalHitModifier.yRot((direction.toYRot() + 90) % 360).scale(0.5);
         Vec3 physicalHitVec = targetCenter.add(sideOffset).add(rotatedHitModifier);
         Vec3 hitVec = click.useProtocol ? click.hitModifier : physicalHitVec;

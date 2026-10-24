@@ -16,10 +16,17 @@ import java.util.Optional;
 @SuppressWarnings("EnhancedSwitchMigration")
 public class BlockStateUtils extends BlockUtils {
     private final static BooleanProperty wallUpProperty = BlockStateProperties.UP;
+    //#if MC >= 11600
     private final static EnumProperty<WallSide> wallNorthProperty = BlockStateProperties.NORTH_WALL;
     private final static EnumProperty<WallSide> wallSouthProperty = BlockStateProperties.SOUTH_WALL;
     private final static EnumProperty<WallSide> wallWestProperty = BlockStateProperties.WEST_WALL;
     private final static EnumProperty<WallSide> wallEastProperty = BlockStateProperties.EAST_WALL;
+    //#else
+    //$$ private final static BooleanProperty wallNorthProperty = BlockStateProperties.NORTH;
+    //$$ private final static BooleanProperty wallSouthProperty = BlockStateProperties.SOUTH;
+    //$$ private final static BooleanProperty wallWestProperty = BlockStateProperties.WEST;
+    //$$ private final static BooleanProperty wallEastProperty = BlockStateProperties.EAST;
+    //#endif
     private final static BooleanProperty northProperty = BlockStateProperties.NORTH;
     private final static BooleanProperty southProperty = BlockStateProperties.SOUTH;
     private final static BooleanProperty westProperty = BlockStateProperties.WEST;

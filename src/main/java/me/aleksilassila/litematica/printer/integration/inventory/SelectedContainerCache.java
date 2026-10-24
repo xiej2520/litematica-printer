@@ -83,7 +83,11 @@ final class SelectedContainerCache {
 
     static String worldId(Minecraft client) {
         if (client.getSingleplayerServer() != null) {
+            //#if MC >= 11600
             return "singleplayer:" + client.getSingleplayerServer().getWorldData().getLevelName();
+            //#else
+            //$$ return "singleplayer:" + client.getSingleplayerServer().getLevel(net.minecraft.world.level.dimension.DimensionType.OVERWORLD).getLevelData().getLevelName();
+            //#endif
         }
         String address = client.getCurrentServer() == null ? null : client.getCurrentServer().ip;
         if (address == null && client.getConnection() != null && client.getConnection().getConnection() != null) {
@@ -104,7 +108,11 @@ final class SelectedContainerCache {
         this.loaded = true;
         if (!Files.isRegularFile(FILE)) return;
         try (Reader reader = Files.newBufferedReader(FILE, StandardCharsets.UTF_8)) {
+            //#if MC >= 11600
             JsonElement parsed = JsonParser.parseReader(reader);
+            //#else
+            //$$ JsonElement parsed = new JsonParser().parse(reader);
+            //#endif
             if (!parsed.isJsonObject() || !parsed.getAsJsonObject().has("entries")) return;
             for (JsonElement element : parsed.getAsJsonObject().getAsJsonArray("entries")) {
                 if (!element.isJsonObject()) continue;

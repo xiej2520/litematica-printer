@@ -24,6 +24,7 @@ import me.aleksilassila.litematica.printer.utils.minecraft.BlockUtils;
 import me.aleksilassila.litematica.printer.utils.minecraft.MessageUtils;
 import me.aleksilassila.litematica.printer.utils.minecraft.PlayerUtils;
 import me.aleksilassila.litematica.printer.utils.minecraft.SpawnCheckUtils;
+import me.aleksilassila.litematica.printer.utils.minecraft.Vec3Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.BlockItem;
@@ -245,7 +246,7 @@ public final class CoverHandler extends FeatureModuleBase {
         }
 
         double interactionRange = PlayerUtils.getPlayerBlockInteractionRange();
-        Vec3 hitPos = Vec3.atCenterOf(support).add(0.0D, 0.5D, 0.0D);
+        Vec3 hitPos = Vec3Utils.atCenterOf(support).add(0.0D, 0.5D, 0.0D);
         if (!this.canReachIterationPosition(pos)
                 || this.player.getEyePosition().distanceToSqr(hitPos) > interactionRange * interactionRange) {
             this.retryTargets.add(pos.immutable());

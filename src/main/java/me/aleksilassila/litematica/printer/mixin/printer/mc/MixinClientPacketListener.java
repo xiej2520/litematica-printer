@@ -38,7 +38,13 @@ public abstract class MixinClientPacketListener {
 
     @Inject(method = "handleChunkBlocksUpdate", at = @At("RETURN"))
     private void invalidateScanCacheSection(ClientboundSectionBlocksUpdatePacket packet, CallbackInfo ci) {
+        //#if MC >= 11602
         packet.runUpdates(ClientBlockUpdateRouter::accept);
+        //#else
+        //$$ for (var update : packet.getUpdates()) {
+        //$$     ClientBlockUpdateRouter.accept(update.getPos(), update.getBlock());
+        //$$ }
+        //#endif
     }
 
 }

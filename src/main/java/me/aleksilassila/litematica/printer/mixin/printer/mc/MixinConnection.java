@@ -39,7 +39,12 @@ public class MixinConnection implements PacketBatchConnection {
         return packet;
     }
 
+    //#if MC >= 11700
     @ModifyVariable(method = "doSendPacket", at = @At("HEAD"), argsOnly = true, ordinal = 0)
+    //#else
+    // 1.15.2 has no doSendPacket: sendPacket writes each packet itself, once and in order.
+    //$$ @ModifyVariable(method = "sendPacket", at = @At("HEAD"), argsOnly = true, ordinal = 0)
+    //#endif
     private Packet<?> printer$trackRecoveryFence(Packet<?> packet) {
         me.aleksilassila.litematica.printer.integration.quickshulker.InventoryRecoveryFence.sent(this, packet);
         return packet;

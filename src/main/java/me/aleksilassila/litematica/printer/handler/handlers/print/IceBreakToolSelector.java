@@ -6,9 +6,11 @@ import me.aleksilassila.litematica.printer.interaction.MiningInteractionPort;
 import me.aleksilassila.litematica.printer.runtime.RuntimeAccess;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.core.Holder;
 import net.minecraft.core.BlockPos;
+//#if MC >= 11802
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
+//#endif
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;

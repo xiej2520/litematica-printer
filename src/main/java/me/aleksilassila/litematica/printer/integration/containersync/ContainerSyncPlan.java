@@ -16,8 +16,11 @@ public record ContainerSyncPlan(List<ItemStack> initial, List<Step> steps, Probl
     public static boolean same(ItemStack a, ItemStack b) {
         //#if MC >= 12006
         return ItemStack.isSameItemSameComponents(a, b);
-        //#else
+        //#elseif MC >= 11600
         //$$ return ItemStack.isSameItemSameTags(a, b);
+        //#else
+        //$$ if (a.isEmpty() || b.isEmpty()) return a.isEmpty() && b.isEmpty();
+        //$$ return a.getItem() == b.getItem() && ItemStack.tagMatches(a, b);
         //#endif
     }
 

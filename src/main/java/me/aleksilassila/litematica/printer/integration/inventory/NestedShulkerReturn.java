@@ -1,5 +1,6 @@
 package me.aleksilassila.litematica.printer.integration.inventory;
 
+import me.aleksilassila.litematica.printer.integration.containersync.ContainerSyncPlan;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
@@ -72,8 +73,8 @@ final class NestedShulkerReturn {
         for (int slot = 0; slot < size; slot++) {
             ItemStack candidate = player.getInventory().getItem(slot);
             boolean wasPresent = slot < before.size()
-                    && ItemStack.isSameItemSameComponents(before.get(slot), candidate);
-            if (!wasPresent && ItemStack.isSameItemSameComponents(candidate, snapshot)) {
+                    && ContainerSyncPlan.same(before.get(slot), candidate);
+            if (!wasPresent && ContainerSyncPlan.same(candidate, snapshot)) {
                 if (found >= 0) return -1;
                 found = slot;
             }

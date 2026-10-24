@@ -1,0 +1,19 @@
+// Only used for building the pinned, unmodified xiej 1.15.2 source archives.
+settingsEvaluated { settings ->
+    settings.pluginManagement.resolutionStrategy.eachPlugin {
+        if (requested.id.id == 'fabric-loom') {
+            useModule('net.fabricmc:fabric-loom:1.10.5')
+        }
+    }
+}
+allprojects {
+    repositories { mavenLocal() }
+    afterEvaluate {
+        publishing {
+            // Quick Shulker's own publication is commented out upstream.
+            if (publications.isEmpty()) {
+                publications { mavenJava(MavenPublication) { from components.java } }
+            }
+        }
+    }
+}

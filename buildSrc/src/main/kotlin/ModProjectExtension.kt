@@ -54,9 +54,9 @@ val Project.javaVersion
         mcVersionInt >= 12005 -> JavaVersion.VERSION_21
         mcVersionInt >= 11800 -> JavaVersion.VERSION_17
         mcVersionInt >= 11700 -> JavaVersion.VERSION_16
-        else -> JavaVersion.VERSION_1_8
+        else -> JavaVersion.VERSION_17  // 1.15.2 shares the 1.18.2 sources; its jar is downgraded to Java 8
     }
-val Project.mixinJavaVersion get() = "JAVA_${javaVersion}"
+val Project.mixinJavaVersion get() = if (mcVersionInt < 11700) "JAVA_8" else "JAVA_${javaVersion}"
 
 val Project.fullProjectVersion: String get() {
     return ciBuildVersion ?: "$modVersion-local"
@@ -87,6 +87,8 @@ val Project.placeholderProps: Map<String, Any?>
         "mod_license" to modLicense,
         "mod_sources" to modSources,
         "loader_version" to fabricLoaderVersion,
+        // Fabric API used the mod id `fabric` in the 1.15.2 generation.
+        "fabric_api_mod_id" to if (mcVersionInt == 11502) "fabric" else "fabric-api",
         "fabric_api_version" to fabricApiVersion,
         "minecraft_dependency" to mcDependency,
         "compatibility_level" to mixinJavaVersion,
@@ -95,9 +97,14 @@ val Project.placeholderProps: Map<String, Any?>
         } else {
             ""
         },
+        // 1.15.2 only: see compat.legacy.LegacyApi.
+        "legacy_client_mixins" to if (mcVersionInt == 11502) {
+            listOf("AxeItemAccessor", "BlockMixin", "BlockStateMixin", "ContainerMenuMixin", "DimensionTypeMixin", "EntityMixin", "ItemStackMixin", "LevelChunkSectionMixin", "LevelMixin", "PlaneMixin", "PlayerMixin", "SlotMixin")
+                .joinToString("") { "\"printer.mc.legacy.$it\",\n    " }
+        } else "",
         "beacon_client_mixins" to if (mcVersionInt < 260200) {
             "\"printer.mc.BeaconBlockEntityAccessor\",\n" +
-                    "    \"printer.mc.BeaconButtonAccessor\",\n" +
+                    (if (mcVersionInt >= 11802) "    \"printer.mc.BeaconButtonAccessor\",\n" else "") +
                     "    \"printer.mc.BeaconScreenMixin\","
         } else {
             ""

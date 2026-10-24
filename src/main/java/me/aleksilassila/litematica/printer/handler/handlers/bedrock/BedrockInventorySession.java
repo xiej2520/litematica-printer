@@ -6,6 +6,7 @@ import me.aleksilassila.litematica.printer.utils.VoidWarehouseTriggerItem;
 import me.aleksilassila.litematica.printer.runtime.RuntimeAccess;
 import me.aleksilassila.litematica.printer.utils.minecraft.InventorySyncPackets;
 import me.aleksilassila.litematica.printer.utils.minecraft.NetworkUtils;
+import me.aleksilassila.litematica.printer.integration.containersync.ContainerSyncPlan;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -240,7 +241,7 @@ final class BedrockInventorySession {
                     //#if MC > 12004
                     && ItemStack.isSameItemSameComponents(baseline, current)
                     //#else
-                    //$$ && ItemStack.isSameItemSameTags(baseline, current)
+                    //$$ && ContainerSyncPlan.same(baseline, current)
                     //#endif
                     && VoidWarehouseTriggerItem.isUsableAsMaterial(current)) return slot;
         }

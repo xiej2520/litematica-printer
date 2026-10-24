@@ -5,6 +5,7 @@ import me.aleksilassila.litematica.printer.interaction.ToolPreparationResult;
 import me.aleksilassila.litematica.printer.utils.InventoryUtils;
 import me.aleksilassila.litematica.printer.utils.minecraft.NetworkUtils;
 import me.aleksilassila.litematica.printer.utils.minecraft.PlayerUtils;
+import me.aleksilassila.litematica.printer.integration.containersync.ContainerSyncPlan;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
@@ -352,7 +353,7 @@ public final class BedrockBreaker {
         //#if MC > 12004
         return ItemStack.isSameItemSameComponents(first, second);
         //#else
-        //$$ return ItemStack.isSameItemSameTags(first, second);
+        //$$ return ContainerSyncPlan.same(first, second);
         //#endif
     }
 

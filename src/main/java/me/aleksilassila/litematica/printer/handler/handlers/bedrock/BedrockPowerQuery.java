@@ -77,8 +77,10 @@ final class BedrockPowerQuery {
             return this.isOverridden(pos) ? this.getBlockState(pos).getFluidState() : this.level.getFluidState(pos);
         }
 
+        //#if MC >= 11700
         @Override public int getHeight() { return this.level.getHeight(); }
         @Override public int getMinY() { return this.level.getMinY(); }
+        //#endif
 
         private boolean isOverridden(BlockPos pos) {
             return this.removedTorches.contains(pos) || pos.equals(this.replacementPos) || pos.equals(this.removedHead);

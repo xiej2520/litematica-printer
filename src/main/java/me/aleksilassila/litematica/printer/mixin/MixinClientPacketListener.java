@@ -62,6 +62,7 @@ public abstract class MixinClientPacketListener {
 
     @Inject(at = @At("TAIL"), method = "handleContainerContent")
     public void onInventory(ClientboundContainerSetContentPacket packet, CallbackInfo ci) {
+        //#if MC >= 11700
         Minecraft client = Minecraft.getInstance();
         //#if MC >= 12105
         int containerId = packet.containerId();
@@ -89,11 +90,19 @@ public abstract class MixinClientPacketListener {
         //#else
         //$$ RuntimeAccess.get().containerSync().content(containerId, packet.getStateId(), items, carried);
         //#endif
+        //#else
+        //$$ if ((Object) this == Minecraft.getInstance().getConnection()) {
+        //$$     me.aleksilassila.litematica.printer.compat.legacy.LegacyMenuProtocol.content(packet.getContainerId(), packet.getItems());
+        //$$ }
+        //#endif
     }
     @Inject(at = @At("TAIL"), method = "handleContainerSetSlot")
     private void printer$confirmQuickShulkerSlot(ClientboundContainerSetSlotPacket packet, CallbackInfo ci) {
         if ((Object) this != Minecraft.getInstance().getConnection()) return;
         QuickShulkerBridge.onSlotUpdate(packet.getContainerId(), packet.getSlot(), packet.getItem());
+        //#if MC < 11700
+        //$$ me.aleksilassila.litematica.printer.compat.legacy.LegacyMenuProtocol.slot(packet.getContainerId(), packet.getSlot());
+        //#endif
     }
 
     //#if MC >= 12004
@@ -135,6 +144,14 @@ public abstract class MixinClientPacketListener {
 
     @Inject(at = @At("TAIL"), method = "handleChunkBlocksUpdate")
     private void printer$logSectionReply(ClientboundSectionBlocksUpdatePacket packet, CallbackInfo ci) {
+        //#if MC >= 11602
         if (QuickShulkerDiagnostics.enabled()) packet.runUpdates(QuickShulkerDiagnostics::blockReply);
+        //#else
+        //$$ if (QuickShulkerDiagnostics.enabled()) {
+        //$$     for (var update : packet.getUpdates()) {
+        //$$         QuickShulkerDiagnostics.blockReply(update.getPos(), update.getBlock());
+        //$$     }
+        //$$ }
+        //#endif
     }
 }

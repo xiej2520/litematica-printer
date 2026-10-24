@@ -7,6 +7,7 @@ import me.aleksilassila.litematica.printer.utils.InventoryUtils;
 import me.aleksilassila.litematica.printer.utils.minecraft.BlockUtils;
 import me.aleksilassila.litematica.printer.utils.minecraft.DirectionUtils;
 import me.aleksilassila.litematica.printer.utils.minecraft.NetworkUtils;
+import me.aleksilassila.litematica.printer.utils.minecraft.Vec3Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
@@ -226,7 +227,7 @@ public final class BedrockPlacer {
         PlayerLook look = new PlayerLook(clickedFace.getOpposite());
         NetworkUtils.sendLookPacketIgnoringQueuedLook(player, look);
         // Use center of the support block for more reliable interaction
-        BlockHitResult hitResult = new BlockHitResult(Vec3.atCenterOf(supportPos), clickedFace, supportPos, false);
+        BlockHitResult hitResult = new BlockHitResult(Vec3Utils.atCenterOf(supportPos), clickedFace, supportPos, false);
         boolean accepted = item == Blocks.REDSTONE_TORCH.asItem() ? this.placeTorchWithReceipt(player, hitResult)
                 : placeBlockAggressively(player, hitResult, true, InteractionHand.MAIN_HAND);
         if (accepted) {
@@ -324,7 +325,7 @@ public final class BedrockPlacer {
                 .findFirst().orElse(null);
         if (interaction == null) return null;
         Direction clickedFace = interaction.clickedFace();
-        var hit = new BlockHitResult(Vec3.atCenterOf(interaction.anchorPos()).add(
+        var hit = new BlockHitResult(Vec3Utils.atCenterOf(interaction.anchorPos()).add(
                 clickedFace.getStepX() * 0.5, clickedFace.getStepY() * 0.5, clickedFace.getStepZ() * 0.5),
                 interaction.clickedFace(), interaction.anchorPos().immutable(), false);
         return new PreparedPistonPlacement(hit, look);
@@ -368,7 +369,7 @@ public final class BedrockPlacer {
             clickedFace = placementInteraction.clickedFace();
         }
 
-        BlockHitResult hitResult = new BlockHitResult(Vec3.atCenterOf(clickedPos), clickedFace, clickedPos, false);
+        BlockHitResult hitResult = new BlockHitResult(Vec3Utils.atCenterOf(clickedPos), clickedFace, clickedPos, false);
 
         boolean accepted = placeBlockAggressively(player, hitResult, false, InteractionHand.OFF_HAND);
         if (accepted) {

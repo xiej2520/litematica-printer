@@ -1,8 +1,12 @@
 package me.aleksilassila.litematica.printer.utils.minecraft;
 
+//#if MC >= 11802
 import net.minecraft.core.Holder;
+//#endif
 import net.minecraft.core.registries.BuiltInRegistries;
+//#if MC >= 11802
 import net.minecraft.resources.ResourceKey;
+//#endif
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;

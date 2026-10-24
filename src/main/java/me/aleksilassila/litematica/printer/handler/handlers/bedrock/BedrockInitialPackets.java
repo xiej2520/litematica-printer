@@ -4,6 +4,7 @@ import me.aleksilassila.litematica.printer.utils.minecraft.NetworkUtils;
 import me.aleksilassila.litematica.printer.utils.InventoryUtils;
 import me.aleksilassila.litematica.printer.printer.PlayerLook;
 import me.aleksilassila.litematica.printer.utils.minecraft.BlockUtils;
+import me.aleksilassila.litematica.printer.utils.minecraft.Vec3Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -95,7 +96,7 @@ final class BedrockInitialPackets {
             if (torch != null) {
                 if (BlockUtils.isReplaceable(level.getBlockState(torch.getTorchPos())) && !torches.containsKey(torch.getTorchPos())) {
                     var face = torch.getClickedFace();
-                    var hit = new BlockHitResult(Vec3.atCenterOf(torch.getSupportPos()).add(
+                    var hit = new BlockHitResult(Vec3Utils.atCenterOf(torch.getSupportPos()).add(
                             face.getStepX() * 0.5, face.getStepY() * 0.5, face.getStepZ() * 0.5),
                             face, torch.getSupportPos(), false);
                     torches.put(torch.getTorchPos(), hit);
@@ -187,7 +188,7 @@ final class BedrockInitialPackets {
         if (!level.isUnobstructed(piston, pos, CollisionContext.empty())) return null;
         if (BedrockEnvironment.getPlacementInteractions(level, pos, anchor).stream()
                 .noneMatch(interaction -> interaction.anchorPos().equals(anchor) && interaction.clickedFace() == facing)) return null;
-        var hit = new BlockHitResult(Vec3.atCenterOf(anchor).add(facing.getStepX() * 0.5,
+        var hit = new BlockHitResult(Vec3Utils.atCenterOf(anchor).add(facing.getStepX() * 0.5,
                 facing.getStepY() * 0.5, facing.getStepZ() * 0.5), facing, anchor, false);
         return new BedrockPlacer.PreparedPistonPlacement(hit, new PlayerLook(facing.getOpposite()));
     }

@@ -50,7 +50,13 @@ public class MixinLocalPlayer extends AbstractClientPlayer {
     }
     //#endif
 
+    //#if MC >= 11700
     @Inject(at = @At("HEAD"), method = "resetPos")
+    //#else
+    // 1.15.2 inherits resetPos instead of overriding it; initialize once on
+    // the first player tick, after Minecraft has installed the new player.
+    //$$ @Inject(at = @At("HEAD"), method = "tick")
+    //#endif
     public void init(CallbackInfo ci) {
         if (!this.litematica_printer$runtimeResetDone) {
             RuntimeAccess.get().reset("local_player_init");
@@ -99,11 +105,16 @@ public class MixinLocalPlayer extends AbstractClientPlayer {
             String line2 = signBlockEntity.getText(front).getMessage(1, false).getString();
             String line3 = signBlockEntity.getText(front).getMessage(2, false).getString();
             String line4 = signBlockEntity.getText(front).getMessage(3, false).getString();
-            //#else
+            //#elseif MC >= 11700
             //$$ String line1 = signBlockEntity.getMessage(0, false).getString();
             //$$ String line2 = signBlockEntity.getMessage(1, false).getString();
             //$$ String line3 = signBlockEntity.getMessage(2, false).getString();
             //$$ String line4 = signBlockEntity.getMessage(3, false).getString();
+            //#else
+            //$$ net.minecraft.network.chat.Component line1 = signBlockEntity.getMessage(0);
+            //$$ net.minecraft.network.chat.Component line2 = signBlockEntity.getMessage(1);
+            //$$ net.minecraft.network.chat.Component line3 = signBlockEntity.getMessage(2);
+            //$$ net.minecraft.network.chat.Component line4 = signBlockEntity.getMessage(3);
             //#endif
             //#if MC >= 260300
             //$$ ServerboundSignUpdatePacket packet = new ServerboundSignUpdatePacket(sign.getBlockPos(),

@@ -3,13 +3,17 @@ package me.aleksilassila.litematica.printer.utils.minecraft;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
+//#if MC >= 11802
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
+//#endif
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.effect.MobEffectUtil;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+//#if MC >= 11802
 import net.minecraft.world.entity.ai.attributes.Attributes;
+//#endif
 import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -80,7 +84,7 @@ public class PlayerUtils {
     public static boolean isWithinWorkInteractedEuclideanRange(BlockPos blockPos, double range) {
         LocalPlayer player = client.player;
         if (player == null || blockPos == null) return false;
-        return player.getEyePosition().distanceToSqr(Vec3.atCenterOf(blockPos)) <= range * range;
+        return player.getEyePosition().distanceToSqr(Vec3Utils.atCenterOf(blockPos)) <= range * range;
     }
 
     // 八面体（曼哈顿距离）

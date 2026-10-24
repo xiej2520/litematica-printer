@@ -149,7 +149,7 @@ public class HighlightBlockRenderer implements IRenderer {
         //#endif
 
         //#if MC > 12101
-        //#else
+        //#elseif MC >= 11700
         //$$ RenderSystem.setShader(GameRenderer::getPositionColorShader);
         //#endif
         //#if MC <= 260100
@@ -173,7 +173,11 @@ public class HighlightBlockRenderer implements IRenderer {
         MeshData meshData;
         //#else
         //$$ BufferBuilder buffer = tesselator.getBuilder();
+        //#if MC >= 11700
         //$$ buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+        //#else
+        //$$ buffer.begin(org.lwjgl.opengl.GL11.GL_QUADS, DefaultVertexFormat.POSITION_COLOR);
+        //#endif
         //#endif
         for (BlockPos pos : posSet) {
             //#if MC >= 12105
@@ -231,8 +235,10 @@ public class HighlightBlockRenderer implements IRenderer {
     public void onRenderWorldLast(RenderTarget fb, Matrix4fc matrices, CameraRenderState cameraState, Frustum culling, RenderBuffers buffers, GpuBufferSlice terrainFog, Vector4f fogColor, ProfilerFiller profiler) {
     //#elseif MC > 12004
     //$$ public void onRenderWorldLast(Matrix4f matrices, Matrix4f projMatrix) {
-    //#else
+    //#elseif MC >= 11600
     //$$ public void onRenderWorldLast(PoseStack matrices, Matrix4f projMatrix){
+    //#else
+    //$$ public void onRenderWorldLast(float partialTicks, PoseStack matrices){
     //#endif
         List<HighlightRenderSnapshot> snapshots = new ArrayList<>();
         synchronized (HIGHLIGHT_LOCK) {

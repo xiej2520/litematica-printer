@@ -6,13 +6,16 @@ import me.aleksilassila.litematica.printer.runtime.RuntimeAccess;
 import me.aleksilassila.litematica.printer.utils.InventoryUtils;
 import me.aleksilassila.litematica.printer.utils.VoidWarehouseTriggerItem;
 import me.aleksilassila.litematica.printer.utils.minecraft.PlayerUtils;
+import me.aleksilassila.litematica.printer.integration.containersync.ContainerSyncPlan;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.effect.MobEffectUtil;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+//#if MC >= 11802
 import net.minecraft.world.entity.ai.attributes.Attributes;
+//#endif
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -82,7 +85,7 @@ public final class BedrockInventory {
         LocalPlayer player = CLIENT.player;
         if (player == null || state == null || state.isAir()) return false;
         ItemStack best = cleanup ? findBestCleanupBreakingStack(player, state) : findBestBreakingStack(player, state);
-        return !best.isEmpty() && !ItemStack.isSameItemSameComponents(best, player.getMainHandItem())
+        return !best.isEmpty() && !ContainerSyncPlan.same(best, player.getMainHandItem())
                 && !Inventory.isHotbarSlot(player.getInventory().findSlotMatchingItem(best));
     }
 
@@ -163,7 +166,7 @@ public final class BedrockInventory {
         if (bestStack.isEmpty()) {
             return false;
         }
-        if (ItemStack.isSameItemSameComponents(bestStack, player.getMainHandItem())) {
+        if (ContainerSyncPlan.same(bestStack, player.getMainHandItem())) {
             return true;
         }
         boolean inventorySwap = !Inventory.isHotbarSlot(player.getInventory().findSlotMatchingItem(bestStack));

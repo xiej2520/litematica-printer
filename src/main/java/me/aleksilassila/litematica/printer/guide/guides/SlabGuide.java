@@ -8,6 +8,7 @@ import me.aleksilassila.litematica.printer.printer.SchematicBlockContext;
 import me.aleksilassila.litematica.printer.printer.action.Action;
 import me.aleksilassila.litematica.printer.printer.action.ClickAction;
 import me.aleksilassila.litematica.printer.utils.minecraft.DirectionUtils;
+import me.aleksilassila.litematica.printer.utils.minecraft.Vec3Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.SlabBlock;
@@ -70,7 +71,7 @@ public class SlabGuide extends Guide {
                     continue;
                 }
             }
-            sides.put(side, Vec3.atLowerCornerOf(DirectionUtils.getVector(half)).scale(0.25));
+            sides.put(side, Vec3Utils.atLowerCornerOf(DirectionUtils.getVector(half)).scale(0.25));
         }
 
         return Result.success(new Action().setSides(sides));

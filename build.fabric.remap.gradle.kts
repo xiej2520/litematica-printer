@@ -15,6 +15,16 @@ version = artifactVersion
 group = modMavenGroup
 
 repositories {
+    if (mcVersionInt == 11502) {
+        // The xiej fork builds share their coordinates with the public masa jars, so take them only from Maven local.
+        exclusiveContent {
+            forRepository { mavenLocal() }
+            filter {
+                includeGroupAndSubgroups("fi.dy.masa")
+                includeGroup("net.kyrptonaught")
+            }
+        }
+    }
     mavenCentral()
     fun strictMaven(url: String, vararg groups: String) = exclusiveContent {
         forRepository { maven(url) }
@@ -27,11 +37,13 @@ repositories {
     }
     strictMaven("https://maven.fabricmc.net")
     strictMaven("https://maven.fallenbreath.me/releases")
-    strictMaven("https://masa.dy.fi/maven/sakura-ryoko", "fi.dy.masa")
+    if (mcVersionInt != 11502) {
+        strictMaven("https://masa.dy.fi/maven/sakura-ryoko", "fi.dy.masa")
+    }
     strictMaven("https://www.cursemaven.com", "curse.maven")
     strictMaven("https://api.modrinth.com/maven", "maven.modrinth")
 
-    if (mcVersionInt <= 12006) {
+    if (mcVersionInt in 11802..12006) {
         strictMaven("https://maven.kyrptonaught.dev", "net.kyrptonaught")  // KyrptConfig依赖
     }
 
@@ -126,11 +138,16 @@ dependencies {
         } else {
             modImplementation("me.fallenbreath:conditional-mixin-fabric:0.6.4")
         }
-    } else {
+    } else if (mcVersionInt >= 11802) {
         modImplementation("curse.maven:quick-shulker-362669:${prop("quick_shulker")}")
         modImplementation("net.kyrptonaught:kyrptconfig:${prop("kyrptconfig")}") {
             exclude(group = "com.terraformersmc", module = "modmenu")
             exclude(group = "maven.modrinth", module = "modmenu")
+        }
+    } else {
+        // xiej's 1.15.2 port, with kyrptconfig bundled.
+        modImplementation("net.kyrptonaught:quickshulker:${prop("quick_shulker")}") {
+            exclude(group = "com.terraformersmc", module = "modmenu")
         }
     }
 
@@ -145,6 +162,22 @@ dependencies {
 
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
+}
+
+if (mcVersionInt == 11502) {
+    // Compiled as Java 17 like 1.18.2, then downgraded for Minecraft 1.15.2's Java 8 runtime.
+    apply(plugin = "xyz.wagyourtail.jvmdowngrader")
+    tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar") {
+        inputFile.set(tasks.named<xyz.wagyourtail.jvmdg.gradle.task.ShadeJar>("shadeDowngradedApi").flatMap { it.archiveFile })
+    }
+
+    // Compile-time declarations of the methods compat.legacy.LegacyApi adds to 1.15.2 classes.
+    loom.fabricModJsonPath.set(file("legacy-interfaces.json"))
+
+    // The unit test fixtures construct newer Minecraft classes, so the tests do not compile here.
+    listOf("compileTestJava", "test", "jacocoTestReport", "jacocoTestCoverageVerification").forEach { name ->
+        tasks.named(name) { enabled = false }
+    }
 }
 
 loom {

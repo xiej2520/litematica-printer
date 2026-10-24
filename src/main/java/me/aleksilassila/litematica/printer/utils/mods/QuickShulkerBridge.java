@@ -8,6 +8,7 @@ import me.aleksilassila.litematica.printer.config.Configs;
 import me.aleksilassila.litematica.printer.core.action.ResourceLease;
 import me.aleksilassila.litematica.printer.runtime.RuntimeAccess;
 import me.aleksilassila.litematica.printer.utils.InventoryUtils;
+import me.aleksilassila.litematica.printer.integration.containersync.ContainerSyncPlan;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.item.Item;
@@ -100,7 +101,7 @@ public final class QuickShulkerBridge {
 
     public static boolean handlePickBlock(LocalPlayer player, ItemStack stack) {
         if (player == null || stack == null || stack.isEmpty()
-                || ItemStack.isSameItemSameComponents(player.getMainHandItem(), stack)) {
+                || ContainerSyncPlan.same(player.getMainHandItem(), stack)) {
             return false;
         }
         return handleMissingPickBlock(player, stack.getItem());

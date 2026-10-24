@@ -7,6 +7,7 @@ import me.aleksilassila.litematica.printer.printer.PlayerLook;
 import me.aleksilassila.litematica.printer.printer.PrinterUtils;
 import me.aleksilassila.litematica.printer.utils.minecraft.BlockUtils;
 import me.aleksilassila.litematica.printer.utils.minecraft.DirectionUtils;
+import me.aleksilassila.litematica.printer.utils.minecraft.Vec3Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
@@ -189,7 +190,7 @@ public class Action {
             return;
         }
         Vec3 eye = player.getEyePosition();
-        Vec3 center = Vec3.atCenterOf(pos);
+        Vec3 center = Vec3Utils.atCenterOf(pos);
         for (int i = 1; i < sides.size(); i++) {
             Direction current = sides.get(i);
             double currentScore = getClickedFaceScore(eye, center, current);

@@ -262,8 +262,9 @@ abstract class ModPlugin : Plugin<Project> {
                                 // actual source lines so the size gate measures responsibilities
                                 // rather than whether a class uses generous spacing.
                                 val lineCount = text.lineSequence().count { it.isNotBlank() }
-                                if (relative.contains("/mixin/") && lineCount > 150) {
-                                    violations += "$relative: mixin has $lineCount lines (maximum 150)"
+                                // This branch keeps every pre-26.1 target, so mixins carry their //#if blocks.
+                                if (relative.contains("/mixin/") && lineCount > 200) {
+                                    violations += "$relative: mixin has $lineCount lines (maximum 200)"
                                 }
                                 if (relative.endsWith("/handler/FeatureModuleBase.java") && lineCount > 400) {
                                     violations += "$relative: orchestration base has $lineCount lines (maximum 400)"

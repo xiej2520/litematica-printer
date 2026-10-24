@@ -10,12 +10,18 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 // Priority rationale: a short-lived printer look lease must be the final packet rotation while
 // leaving every packet byte-identical when no scoped/action look override exists.
+//#if MC >= 11700
 @Mixin(value = ServerboundMovePlayerPacket.class, priority = 1010)
+//#else
+//$$ @Mixin(value = {ServerboundMovePlayerPacket.Rot.class, ServerboundMovePlayerPacket.PosRot.class}, priority = 1010)
+//#endif
 public class MixinServerboundMovePlayerPacket {
     //#if MC > 12101
     @ModifyVariable(method = "<init>(DDDFFZZZZ)V", at = @At("HEAD"), ordinal = 0, argsOnly = true)
-    //#else
+    //#elseif MC >= 11700
     //$$ @ModifyVariable(method = "<init>(DDDFFZZZ)V", at = @At("HEAD"), ordinal = 0, argsOnly = true)
+    //#else
+    //$$ @ModifyVariable(method = {"<init>(FFZ)V", "<init>(DDDFFZ)V"}, at = @At("HEAD"), ordinal = 0, argsOnly = true)
     //#endif
     private static float modifyLookYaw(float yaw) {
         if (NetworkUtils.shouldBypassQueuedLookOverride()) {
@@ -34,8 +40,10 @@ public class MixinServerboundMovePlayerPacket {
 
     //#if MC > 12101
     @ModifyVariable(method = "<init>(DDDFFZZZZ)V", at = @At("HEAD"), ordinal = 1, argsOnly = true)
-    //#else
+    //#elseif MC >= 11700
     //$$ @ModifyVariable(method = "<init>(DDDFFZZZ)V", at = @At("HEAD"), ordinal = 1, argsOnly = true)
+    //#else
+    //$$ @ModifyVariable(method = {"<init>(FFZ)V", "<init>(DDDFFZ)V"}, at = @At("HEAD"), ordinal = 1, argsOnly = true)
     //#endif
     private static float modifyLookPitch(float pitch) {
         if (NetworkUtils.shouldBypassQueuedLookOverride()) {

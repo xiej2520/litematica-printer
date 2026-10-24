@@ -13,7 +13,11 @@ import me.aleksilassila.litematica.printer.utils.ConfigUtils;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+//#if MC >= 11802
 import net.minecraft.resources.ResourceKey;
+//#else
+//$$ import net.minecraft.world.level.dimension.DimensionType;
+//#endif
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseRailBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -193,14 +197,14 @@ public class RailGuide extends Guide {
     }
 
     private void clearRepairState(BlockPos pos) {
-        ResourceKey<Level> dimension = level.dimension();
+        var dimension = level.dimension();
         repairAttempts.keySet().removeIf(key -> key.matches(dimension, pos));
         pendingRepairs.keySet().removeIf(key -> key.matches(dimension, pos));
         stableRepairs.keySet().removeIf(key -> key.matches(dimension, pos));
     }
 
     private void clearPendingRepairState(BlockPos pos) {
-        ResourceKey<Level> dimension = level.dimension();
+        var dimension = level.dimension();
         pendingRepairs.keySet().removeIf(key -> key.matches(dimension, pos));
     }
 
@@ -228,8 +232,13 @@ public class RailGuide extends Guide {
         return !BaseRailBlock.isRail(schematicState) || BaseRailBlock.isRail(level.getBlockState(pos));
     }
 
+    //#if MC >= 11802
     private record RailRepairKey(ResourceKey<Level> dimension, BlockPos pos, RailShape requiredShape) {
         private boolean matches(ResourceKey<Level> dimension, BlockPos pos) {
+    //#else
+    //$$ private record RailRepairKey(DimensionType dimension, BlockPos pos, RailShape requiredShape) {
+    //$$     private boolean matches(DimensionType dimension, BlockPos pos) {
+    //#endif
             return this.dimension.equals(dimension) && this.pos.equals(pos);
         }
     }

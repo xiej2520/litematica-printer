@@ -3,6 +3,7 @@ package me.aleksilassila.litematica.printer.handler.handlers;
 import me.aleksilassila.litematica.printer.config.Configs;
 import me.aleksilassila.litematica.printer.integration.tweakeroo.TweakerooAdapter;
 import me.aleksilassila.litematica.printer.mixin_extension.BlockBreakResult;
+import me.aleksilassila.litematica.printer.utils.minecraft.Vec3Utils;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.Item;
@@ -120,7 +121,7 @@ final class MineToolSession {
 
     static double distanceScore(LocalPlayer player, MineBreakExecutor.Target target) {
         Vec3 eye = player.getEyePosition();
-        return Vec3.atCenterOf(target.pos()).distanceToSqr(eye);
+        return Vec3Utils.atCenterOf(target.pos()).distanceToSqr(eye);
     }
 
 }

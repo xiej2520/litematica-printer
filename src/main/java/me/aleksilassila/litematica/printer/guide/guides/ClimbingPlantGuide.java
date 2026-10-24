@@ -1,3 +1,4 @@
+//#if MC >= 11600
 package me.aleksilassila.litematica.printer.guide.guides;
 
 import me.aleksilassila.litematica.printer.enums.BlockMatchResult;
@@ -18,6 +19,7 @@ public class ClimbingPlantGuide extends Guide {
 
     @Override
     protected Result onBuildActionMissingBlock(BlockMatchResult state) {
+        //#if MC >= 11700
         if (requiredBlock instanceof net.minecraft.world.level.block.BigDripleafStemBlock) {
             return Result.success(new Action().setItem(Items.BIG_DRIPLEAF));
         }
@@ -25,6 +27,7 @@ public class ClimbingPlantGuide extends Guide {
                 || requiredBlock instanceof net.minecraft.world.level.block.CaveVinesPlantBlock) {
             return Result.success(new Action().setItem(Items.GLOW_BERRIES).setRequiresSupport());
         }
+        //#endif
         if (requiredBlock instanceof net.minecraft.world.level.block.WeepingVinesBlock
                 || requiredBlock instanceof net.minecraft.world.level.block.WeepingVinesPlantBlock) {
             return Result.success(new Action().setItem(Items.WEEPING_VINES).setRequiresSupport());
@@ -48,3 +51,4 @@ public class ClimbingPlantGuide extends Guide {
         return Result.SKIP;
     }
 }
+//#endif

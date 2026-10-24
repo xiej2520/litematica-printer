@@ -68,10 +68,17 @@ public abstract class MixinMultiPlayerGameMode implements MultiPlayerGameModeExt
     //#else
     //$$ @Inject(method = "handleInventoryMouseClick", at = @At("HEAD"), cancellable = true)
     //#endif
+    //#if MC >= 11700
     private void printer$guardContainerSyncInput(CallbackInfo ci) {
         if (RuntimeAccess.get().containerSync().guardManualInput()
                 || RuntimeAccess.get().chestTrackerAdapter().guardManualInput()) ci.cancel();
     }
+    //#else
+    //$$ private void printer$guardContainerSyncInput(org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable<ItemStack> ci) {
+    //$$     if (RuntimeAccess.get().containerSync().guardManualInput()
+    //$$             || RuntimeAccess.get().chestTrackerAdapter().guardManualInput()) ci.setReturnValue(ItemStack.EMPTY);
+    //$$ }
+    //#endif
 
     @Inject(method = "tick", at = @At("HEAD"))
     private void litematica_printer$tickMiningController(CallbackInfo ci) {
@@ -126,16 +133,26 @@ public abstract class MixinMultiPlayerGameMode implements MultiPlayerGameModeExt
         float yaw = player.getYRot();
         float pitch = player.getXRot();
         try {
+            //#if MC >= 11700
             player.setYRot(look.yaw);
             player.setXRot(look.pitch);
+            //#else
+            //$$ player.yRot = look.yaw;
+            //$$ player.xRot = look.pitch;
+            //#endif
             //#if MC > 11802
             return this.useItem(player, hand);
             //#else
             //$$ return this.useItem(player, player.level, hand);
             //#endif
         } finally {
+            //#if MC >= 11700
             player.setYRot(yaw);
             player.setXRot(pitch);
+            //#else
+            //$$ player.yRot = yaw;
+            //$$ player.xRot = pitch;
+            //#endif
         }
     }
 

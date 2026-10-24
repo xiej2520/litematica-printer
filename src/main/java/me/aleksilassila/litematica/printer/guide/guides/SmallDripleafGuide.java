@@ -1,3 +1,4 @@
+//#if MC >= 11700
 package me.aleksilassila.litematica.printer.guide.guides;
 
 import me.aleksilassila.litematica.printer.enums.BlockMatchResult;
@@ -17,3 +18,4 @@ public final class SmallDripleafGuide extends Guide {
                 .setNeedWaitModifyLook());
     }
 }
+//#endif

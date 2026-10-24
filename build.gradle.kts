@@ -2,6 +2,7 @@ plugins {
     id("maven-publish")
     id("net.fabricmc.fabric-loom") version "1.17.20" apply false
     id("net.fabricmc.fabric-loom-remap") version "1.17.20" apply false
+    id("xyz.wagyourtail.jvmdowngrader") version "2.0.1" apply false
 
     // https://github.com/ReplayMod/preprocessor
     // https://github.com/Fallen-Breath/preprocessor
@@ -12,6 +13,7 @@ plugins {
 preprocess {
     strictExtraMappings.set(false)
 
+    val mc11502 = createNode("1.15.2", 1_15_02, "mojang")
     val mc11802 = createNode("1.18.2", 1_18_02, "mojang")
     val mc11904 = createNode("1.19.4", 1_19_04, "mojang")
     val mc12001 = createNode("1.20.1", 1_20_01, "mojang")
@@ -29,6 +31,7 @@ preprocess {
     val mc260200 = createNode("26.2", 260200, "mojang")
     val mc260300 = createNode("26.3", 260300, "mojang")
 
+    mc11502.link(mc11802, file("versions/mapping-1.15.2-1.18.2.txt"))
     mc11802.link(mc11904, file("versions/mapping-1.18.2-1.19.4.txt"))
     mc11904.link(mc12001, null)
     mc12001.link(mc12002, null)

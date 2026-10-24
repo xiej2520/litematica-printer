@@ -36,7 +36,9 @@ public class DefaultGuide extends Guide {
         // 获取属性
         Direction facing = getProperty(requiredState, BlockStateProperties.FACING)
                 .or(() -> getProperty(requiredState, BlockStateProperties.HORIZONTAL_FACING))
+                //#if MC >= 11700
                 .or(() -> getProperty(requiredState, BlockStateProperties.VERTICAL_DIRECTION))
+                //#endif
                 .or(() -> getProperty(requiredState, BlockStateProperties.FACING_HOPPER))
                 .orElse(null);
         Direction.Axis axis = getProperty(requiredState, BlockStateProperties.AXIS)

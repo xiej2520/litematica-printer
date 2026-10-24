@@ -44,7 +44,9 @@ public class Guides {
         );
 
         // 紫水晶芽
+        //#if MC >= 11700
         register(AmethystGuide::new, AmethystClusterBlock.class);
+        //#endif
 
         // 花
         register(FlowerGuide::new, FlowerBlock.class);
@@ -52,7 +54,9 @@ public class Guides {
 
         register(TallGrassGuide::new, DoublePlantBlock.class);
         register(AquaticPlantGuide::new, SeagrassBlock.class, TallSeagrassBlock.class, KelpBlock.class, KelpPlantBlock.class);
+        //#if MC >= 11700
         register(SmallDripleafGuide::new, SmallDripleafBlock.class);
+        //#endif
         //#if MC >= 12105
         register(LeafLitterGuide::new, LeafLitterBlock.class);
         //#endif
@@ -143,7 +147,9 @@ public class Guides {
         // ============================================================
 
         // 蜡烛（添加/点燃/熄灭）
+        //#if MC >= 11700
         register(CandleGuide::new, CandleBlock.class);
+        //#endif
 
         // 海泡菜
         register(SeaPickleGuide::new, SeaPickleBlock.class);
@@ -200,14 +206,26 @@ public class Guides {
         //#endif
 
         // 藤蔓/发光地衣
-        register(VineGuide::new, VineBlock.class, GlowLichenBlock.class);
+        register(VineGuide::new, VineBlock.class
+                //#if MC >= 11700
+                , GlowLichenBlock.class
+                //#endif
+        );
 
         // 火/灵魂火
-        register(FireGuide::new, FireBlock.class, SoulFireBlock.class);
+        register(FireGuide::new, FireBlock.class
+                //#if MC >= 11600
+                , SoulFireBlock.class
+                //#endif
+        );
 
         // 炼药锅
         register(CauldronGuide::new,
-                CauldronBlock.class, LavaCauldronBlock.class, LayeredCauldronBlock.class);
+                CauldronBlock.class
+                //#if MC >= 11700
+                , LavaCauldronBlock.class, LayeredCauldronBlock.class
+                //#endif
+        );
 
         // 堆肥桶
         register(ComposterGuide::new, ComposterBlock.class);
@@ -229,11 +247,17 @@ public class Guides {
         register(FlowerPotGuide::new, FlowerPotBlock.class);
 
         // 攀爬植物（洞穴藤蔓/垂泪藤/缠怨藤/大垂叶茎）
+        //#if MC >= 11700
         register(ClimbingPlantGuide::new,
                 BigDripleafStemBlock.class,
                 CaveVinesBlock.class, CaveVinesPlantBlock.class,
                 WeepingVinesBlock.class, WeepingVinesPlantBlock.class,
                 TwistingVinesBlock.class, TwistingVinesPlantBlock.class);
+        //#elseif MC >= 11600
+        //$$ register(ClimbingPlantGuide::new,
+        //$$         WeepingVinesBlock.class, WeepingVinesPlantBlock.class,
+        //$$         TwistingVinesBlock.class, TwistingVinesPlantBlock.class);
+        //#endif
 
         // 死珊瑚（需过滤非珊瑚方块）
         register(CoralGuide::new);

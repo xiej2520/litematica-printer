@@ -58,6 +58,7 @@ fabric.properties
 
 # 项目构建/运行/依赖目录 - 推荐**/ 全层级匹配，合并等效项
 **/build/
+/build-forks-1.15.2-*/
 **/run/
 **/libs/
 **/docs/

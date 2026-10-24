@@ -1,7 +1,9 @@
 package me.aleksilassila.litematica.printer.utils;
 
 import net.minecraft.core.registries.BuiltInRegistries;
+//#if MC >= 11802
 import net.minecraft.tags.TagKey;
+//#endif
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -311,10 +313,15 @@ public class FilterUtils {
         }
 
         // 直接处理Block类型的TagKey流，无类型转换
+        //#if MC >= 11802
         Stream<TagKey<Block>> blockTagStream = blockState.tags();
         return blockTagStream
                 .map(tag -> tag.location().toString())
                 .anyMatch(tagFullName -> matchTagName(tagFullName, tagName, matchRules));
+        //#else
+        //$$ return net.minecraft.tags.BlockTags.getAllTags().getMatchingTags(blockState.getBlock()).stream()
+        //$$         .anyMatch(tag -> matchTagName(tag.toString(), tagName, matchRules));
+        //#endif
     }
 
     /**
@@ -326,18 +333,27 @@ public class FilterUtils {
         }
         // 物品标签和方块标签是两套注册表标签。铺盖等方块材料通常
         // 使用方块标签配置，但实际切换材料时拿到的是 BlockItem，二者都要匹配。
+        //#if MC >= 11802
         boolean itemTagMatched = itemStack.tags()
                 .map(tag -> tag.location().toString())
                 .anyMatch(tagFullName -> matchTagName(tagFullName, tagName, matchRules));
+        //#else
+        //$$ boolean itemTagMatched = net.minecraft.tags.ItemTags.getAllTags().getMatchingTags(itemStack.getItem()).stream()
+        //$$         .anyMatch(tag -> matchTagName(tag.toString(), tagName, matchRules));
+        //#endif
         if (itemTagMatched) {
             return true;
         }
         if (!(itemStack.getItem() instanceof BlockItem blockItem)) {
             return false;
         }
+        //#if MC >= 11802
         return blockItem.getBlock().defaultBlockState().tags()
                 .map(tag -> tag.location().toString())
                 .anyMatch(tagFullName -> matchTagName(tagFullName, tagName, matchRules));
+        //#else
+        //$$ return matchBlockTag(blockItem.getBlock().defaultBlockState(), tagName, matchRules);
+        //#endif
     }
 
     private static boolean matchTagName(String actual, String requested, String[] matchRules) {

@@ -15,10 +15,12 @@ public final class AquaticPlantGuide extends Guide {
     public AquaticPlantGuide(SchematicBlockContext context) { super(context); }
 
     @Override protected Result onBuildAction(BlockMatchResult state) {
+        //#if MC >= 11800
         if (state == BlockMatchResult.WRONG_STATE && requiredBlock instanceof KelpBlock
                 && requiredState.getValue(KelpBlock.AGE) == 25 && currentState.getValue(KelpBlock.AGE) < 25) {
             return Result.success(new ClickAction().setItem(Items.SHEARS));
         }
+        //#endif
         if ((requiredBlock instanceof KelpBlock || requiredBlock instanceof KelpPlantBlock)
                 && (currentBlock instanceof KelpBlock || currentBlock instanceof KelpPlantBlock)) {
             // Adding the upper neighbor turns a kelp tip into its stem automatically.

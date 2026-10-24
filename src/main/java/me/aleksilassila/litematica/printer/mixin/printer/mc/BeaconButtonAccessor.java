@@ -1,3 +1,4 @@
+//#if MC >= 11802
 package me.aleksilassila.litematica.printer.mixin.printer.mc;
 
 import org.spongepowered.asm.mixin.Mixin;
@@ -8,3 +9,4 @@ public interface BeaconButtonAccessor {
     @Invoker("updateStatus")
     void litematica_printer$updateStatus(int level);
 }
+//#endif

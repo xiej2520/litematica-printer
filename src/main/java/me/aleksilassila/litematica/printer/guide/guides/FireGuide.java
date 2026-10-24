@@ -8,7 +8,9 @@ import me.aleksilassila.litematica.printer.printer.action.Action;
 import me.aleksilassila.litematica.printer.printer.PrinterUtils;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.FireBlock;
+//#if MC >= 11600
 import net.minecraft.world.level.block.SoulFireBlock;
+//#endif
 import net.minecraft.world.item.Items;
 
 /**
@@ -35,9 +37,11 @@ public class FireGuide extends Guide {
             return Result.SKIP;
         }
         // SoulFire 没有方向属性，AGE 相同即可
+        //#if MC >= 11600
         if (requiredBlock instanceof SoulFireBlock) {
             return Result.SKIP;
         }
+        //#endif
 
         // 方向属性不对 → 放置性错误，破坏重放
         return Result.PASS;

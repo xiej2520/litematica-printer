@@ -10,6 +10,7 @@
     "printer.mc.MixinServerboundMovePlayerPacket"
   ],
   "client": [
+    ${legacy_client_mixins}
     "MixinClientPacketListener",
     "MixinContainerScreenGuard",
     ${crafter_client_mixins}

@@ -11,7 +11,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 //#endif
 
+//#if MC >= 11802
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+//#endif
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -23,7 +25,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.DeltaTracker;
 //#endif
 
-//#if MC < 260000
+//#if MC >= 11802 && MC < 260000
 //$$ import net.minecraft.client.gui.GuiGraphics;
 //#endif
 
@@ -46,8 +48,11 @@ public abstract class MixinGui {
     private void hookRenderHud(GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {
     //#elseif MC > 11904
     //$$ private void hookRenderHud(GuiGraphics guiGraphics, float f, CallbackInfo ci) {
-    //#else
+    //#elseif MC >= 11600
     //$$ private void hookRenderHud(PoseStack poseStack, float f, CallbackInfo ci) {
+    //#else
+    //$$ private void hookRenderHud(float f, CallbackInfo ci) {
+    //$$     PoseStack poseStack = new PoseStack();
     //#endif
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || mc.level == null || mc.player.isSpectator()

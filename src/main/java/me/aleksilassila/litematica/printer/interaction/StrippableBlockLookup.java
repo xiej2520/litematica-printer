@@ -3,7 +3,7 @@ package me.aleksilassila.litematica.printer.interaction;
 //#if MC >= 260300
 //$$ import net.minecraft.core.registries.BuiltInRegistries;
 //$$ import net.minecraft.resources.Identifier;
-//#else
+//#elseif MC >= 11802
 import net.fabricmc.fabric.mixin.content.registry.AxeItemAccessor;
 //#endif
 import net.minecraft.world.level.block.Block;
@@ -30,8 +30,10 @@ public final class StrippableBlockLookup {
         //$$             .ifPresent(source -> result.put(source, stripped));
         //$$ }
         //$$ return result;
-        //#else
+        //#elseif MC >= 11802
         return AxeItemAccessor.getStrippables();
+        //#else
+        //$$ return me.aleksilassila.litematica.printer.mixin.printer.mc.legacy.AxeItemAccessor.printer$strippables();
         //#endif
     }
 }

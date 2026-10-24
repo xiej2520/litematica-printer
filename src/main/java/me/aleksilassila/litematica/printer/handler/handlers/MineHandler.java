@@ -25,6 +25,7 @@ import me.aleksilassila.litematica.printer.integration.tweakeroo.TweakerooAdapte
 import me.aleksilassila.litematica.printer.utils.minecraft.BlockUtils;
 import me.aleksilassila.litematica.printer.utils.minecraft.PlayerUtils;
 import me.aleksilassila.litematica.printer.runtime.PrinterRuntime;
+import me.aleksilassila.litematica.printer.utils.minecraft.Vec3Utils;
 import me.aleksilassila.litematica.printer.runtime.RuntimeAccess;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -677,7 +678,7 @@ public class MineHandler extends FeatureModuleBase {
 
     private boolean canReachTrenchSupport(BlockPos support, Direction clickedFace) {
         if (this.player == null) return false;
-        Vec3 faceCenter = Vec3.atCenterOf(support).add(
+        Vec3 faceCenter = Vec3Utils.atCenterOf(support).add(
                 clickedFace.getStepX() * 0.5D,
                 clickedFace.getStepY() * 0.5D,
                 clickedFace.getStepZ() * 0.5D);
@@ -695,8 +696,12 @@ public class MineHandler extends FeatureModuleBase {
 
     private boolean isTrenchBreakTarget(BlockPos pos, BlockState state) {
         if (state == null || state.getBlock() instanceof LiquidBlock) return false;
+        //#if MC >= 11700
         return !state.getFluidState().isEmpty()
                 || (state.is(Blocks.BUDDING_AMETHYST) && !this.isInSelectionRange(pos));
+        //#else
+        //$$ return !state.getFluidState().isEmpty();
+        //#endif
     }
 
 }

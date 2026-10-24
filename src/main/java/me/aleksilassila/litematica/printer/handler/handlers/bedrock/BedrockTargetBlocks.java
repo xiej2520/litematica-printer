@@ -16,7 +16,9 @@ public final class BedrockTargetBlocks {
         }
         if (state.is(Blocks.BEDROCK)
                 || state.is(Blocks.OBSIDIAN)
+                //#if MC >= 11600
                 || state.is(Blocks.CRYING_OBSIDIAN)
+                //#endif
                 || state.is(Blocks.END_PORTAL_FRAME)
                 || state.is(Blocks.END_PORTAL)) {
             return true;

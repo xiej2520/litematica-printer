@@ -11,6 +11,7 @@ import me.aleksilassila.litematica.printer.printer.PrinterBox;
 import me.aleksilassila.litematica.printer.mixin.printer.litematica.InventoryUtilsAccessor;
 import me.aleksilassila.litematica.printer.utils.minecraft.MessageUtils;
 import me.aleksilassila.litematica.printer.utils.minecraft.PlayerUtils;
+import me.aleksilassila.litematica.printer.utils.minecraft.Vec3Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -175,7 +176,7 @@ public final class ContainerSyncController implements RuntimeComponent {
         //#else
         client.gameMode.useItemOn(client.player, InteractionHand.MAIN_HAND,
         //#endif
-                new BlockHitResult(Vec3.atCenterOf(target), Direction.UP, target, false));
+                new BlockHitResult(Vec3Utils.atCenterOf(target), Direction.UP, target, false));
         // Ordered behind the open: rejection leaves menu 0 active and returns a full snapshot;
         // a successful open changes the server menu ID and ignores this menu-0 no-op.
         QuickShulkerClicks.requestFullSync(client.player.inventoryMenu);
@@ -287,8 +288,12 @@ public final class ContainerSyncController implements RuntimeComponent {
                 // Honour Litematica's protected hotbar; main inventory is the material pool.
                 return inventorySlot >= 9 && inventorySlot < 36
                         || inventorySlot >= 0 && inventorySlot < 9
+                        //#if MC >= 11802
                         && InventoryUtilsAccessor.getPICK_BLOCKABLE_SLOTS().contains(inventorySlot)
                         && InventoryUtilsAccessor.canPickToSlot(client.player.getInventory(), inventorySlot);
+                        //#else
+                        //$$ && InventoryUtilsAccessor.getPICK_BLOCKABLE_SLOTS().contains(inventorySlot + 1); // 1-based
+                        //#endif
             }
             public int capacity(int slot, ItemStack stack) {
                 var targetSlot = menu.getSlot(slot);

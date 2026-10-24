@@ -22,6 +22,7 @@ plugins {
 }
 
 val versions = listOf(
+    "1.15.2",
     "1.18.2",
     "1.19.4",
     "1.20.1", "1.20.2", "1.20.4", "1.20.6",
@@ -30,6 +31,7 @@ val versions = listOf(
 )
 val mainProjectVersion = file("versions/mainProject").readText().trim()
 val preprocessParentChain = mapOf(
+    "1.15.2" to "1.18.2",
     "1.18.2" to "1.19.4",
     "1.19.4" to "1.20.1",
     "1.20.1" to "1.20.2",

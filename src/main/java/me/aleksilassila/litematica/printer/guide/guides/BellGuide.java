@@ -8,6 +8,7 @@ import me.aleksilassila.litematica.printer.printer.action.Action;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.BellBlock;
 import net.minecraft.world.level.block.state.properties.BellAttachType;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 /**
  * 钟
@@ -20,7 +21,7 @@ public class BellGuide extends Guide {
     @Override
     protected Result onBuildActionMissingBlock(BlockMatchResult state) {
         Direction facing = getProperty(requiredState, BellBlock.FACING).orElseThrow();
-        BellAttachType bellAttachment = getProperty(requiredState, BellBlock.ATTACHMENT).orElseThrow();
+        BellAttachType bellAttachment = getProperty(requiredState, BlockStateProperties.BELL_ATTACHMENT).orElseThrow();
 
         Direction side = switch (bellAttachment) {
             case FLOOR -> Direction.DOWN;

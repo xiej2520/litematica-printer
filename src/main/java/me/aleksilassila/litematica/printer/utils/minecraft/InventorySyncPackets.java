@@ -51,9 +51,11 @@ public final class InventorySyncPackets {
         //#if MC >= 12105
         return new ServerboundContainerClickPacket(player.inventoryMenu.containerId, -1,
                 (short) -1, (byte) 0, input, new Int2ObjectOpenHashMap<>(), HashedStack.EMPTY);
-        //#else
+        //#elseif MC >= 11700
         //$$ return new ServerboundContainerClickPacket(player.inventoryMenu.containerId, -1,
         //$$         -1, 0, input, ItemStack.EMPTY, new Int2ObjectOpenHashMap<>());
+        //#else
+        //$$ return me.aleksilassila.litematica.printer.compat.legacy.LegacyMenuProtocol.packet(player, player.inventoryMenu, -1, 0, input);
         //#endif
     }
 }

@@ -63,8 +63,11 @@ public final class SpawnCheckUtils {
                 level,
                 pos,
                 state,
-                state.getFluidState(),
+                state.getFluidState()
+                //#if MC >= 11600
+                ,
                 entityType
+                //#endif
         );
     }
 }

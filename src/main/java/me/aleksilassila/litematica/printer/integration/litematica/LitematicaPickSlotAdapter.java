@@ -21,9 +21,13 @@ public final class LitematicaPickSlotAdapter {
             int slot = InventoryUtilsAccessor.getPICK_BLOCKABLE_SLOTS().get(nextIndex);
             nextIndex = (nextIndex + 1) % slotCount;
             InventoryUtilsAccessor.setNextPickSlotIndex(nextIndex);
+            //#if MC >= 11802
             if (InventoryUtilsAccessor.canPickToSlot(player.getInventory(), slot)) {
                 return slot;
             }
+            //#else
+            //$$ return slot - 1; // 1.15.2 Litematica: 1-based slots, no slot filter
+            //#endif
         }
         return -1;
     }

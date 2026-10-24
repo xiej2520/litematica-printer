@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.LongPredicate;
 
 public final class BedrockCandidatePlanner {
     private static final int REJECTED_PLAN_RETRY_TICKS = 20;
@@ -215,7 +216,7 @@ public final class BedrockCandidatePlanner {
         this.candidateBacklog.removeIf((pos, ignored) -> !sourceBox.contains(pos)
                 || !this.litematica.isWithinSelectionRange(pos)
                 || !BedrockTargetBlocks.isTargetBlock(level.getBlockState(pos)));
-        this.rejectedPlans.keySet().removeIf(key -> {
+        this.rejectedPlans.keySet().removeIf((LongPredicate) key -> {
             BlockPos pos = BlockPos.of(key);
             return !sourceBox.contains(pos)
                     || !this.litematica.isWithinSelectionRange(pos);

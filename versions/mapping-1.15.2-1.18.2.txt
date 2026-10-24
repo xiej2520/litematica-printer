@@ -1,0 +1,7 @@
+net.minecraft.network.protocol.game.ClientboundChunkBlocksUpdatePacket net.minecraft.network.protocol.game.ClientboundSectionBlocksUpdatePacket
+net.minecraft.network.chat.BaseComponent net.minecraft.network.chat.MutableComponent
+org.apache.logging.log4j.Logger org.slf4j.Logger
+org.apache.logging.log4j.LogManager org.slf4j.LoggerFactory
+net.minecraft.world.level.block.CauldronBlock net.minecraft.world.level.block.LayeredCauldronBlock
+net.minecraft.world.level.block.Blocks CAULDRON WATER_CAULDRON
+net.minecraft.world.level.block.Blocks GRASS_PATH DIRT_PATH

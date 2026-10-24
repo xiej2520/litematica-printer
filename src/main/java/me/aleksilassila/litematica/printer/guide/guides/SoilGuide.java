@@ -29,7 +29,10 @@ public class SoilGuide extends Guide {
         if (isDirtPath()) {
             return Result.success(new Action().setItems(
                     Items.DIRT, Items.GRASS_BLOCK, Items.COARSE_DIRT,
-                    Items.ROOTED_DIRT, Items.MYCELIUM, Items.PODZOL));
+                    //#if MC >= 11700
+                    Items.ROOTED_DIRT,
+                    //#endif
+                    Items.MYCELIUM, Items.PODZOL));
         }
         return Result.SKIP;
     }
@@ -45,7 +48,11 @@ public class SoilGuide extends Guide {
             }
         }
         if (isDirtPath()) {
-            Block[] soilBlocks = {Blocks.GRASS_BLOCK, Blocks.DIRT, Blocks.COARSE_DIRT, Blocks.ROOTED_DIRT, Blocks.MYCELIUM, Blocks.PODZOL};
+            Block[] soilBlocks = {Blocks.GRASS_BLOCK, Blocks.DIRT, Blocks.COARSE_DIRT,
+                    //#if MC >= 11700
+                    Blocks.ROOTED_DIRT,
+                    //#endif
+                    Blocks.MYCELIUM, Blocks.PODZOL};
             for (Block soilBlock : soilBlocks) {
                 if (currentBlock.equals(soilBlock)) {
                     return Result.success(new ClickAction().setItems(Reference.SHOVEL_ITEMS));

@@ -3,6 +3,7 @@ package me.aleksilassila.litematica.printer.handler.handlers.bedrock;
 import me.aleksilassila.litematica.printer.runtime.RuntimeAccess;
 import me.aleksilassila.litematica.printer.utils.InventoryUtils;
 import me.aleksilassila.litematica.printer.utils.minecraft.NetworkUtils;
+import me.aleksilassila.litematica.printer.integration.containersync.ContainerSyncPlan;
 import net.minecraft.client.Minecraft;
 //#if MC >= 12101
 import net.minecraft.core.component.DataComponents;
@@ -174,7 +175,7 @@ final class BedrockToolSync {
         //#if MC > 12004
         return first.slot() == second.slot() && ItemStack.isSameItemSameComponents(first.stack(), second.stack());
         //#else
-        //$$ return first.slot() == second.slot() && ItemStack.isSameItemSameTags(first.stack(), second.stack());
+        //$$ return first.slot() == second.slot() && ContainerSyncPlan.same(first.stack(), second.stack());
         //#endif
     }
 

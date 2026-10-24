@@ -14,6 +14,8 @@ import me.aleksilassila.litematica.printer.utils.mods.TakeItOutUtils;
 import me.aleksilassila.litematica.printer.utils.mods.LitematicaUtils;
 import me.aleksilassila.litematica.printer.utils.minecraft.MessageUtils;
 import me.aleksilassila.litematica.printer.runtime.RuntimeAccess;
+import me.aleksilassila.litematica.printer.utils.minecraft.Vec3Utils;
+import me.aleksilassila.litematica.printer.integration.containersync.ContainerSyncPlan;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
@@ -500,7 +502,7 @@ public final class ChestTrackerAdapter implements InventoryProvider, RuntimeComp
         this.openingMenu = this.client.player.containerMenu;
         this.openingRevision = this.openingMenu.getStateId();
         this.suppressContainerScreen = true;
-        BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(pos), Direction.UP, pos, false);
+        BlockHitResult hit = new BlockHitResult(Vec3Utils.atCenterOf(pos), Direction.UP, pos, false);
         InteractionResult result = InteractionUtils.getRuntime().useItemOn(false, InteractionHand.MAIN_HAND, hit);
         if (result == InteractionResult.FAIL) { this.openingMenu = null; releaseResources(); return false; }
         QuickShulkerClicks.requestFullSync(this.openingMenu);
@@ -673,7 +675,7 @@ public final class ChestTrackerAdapter implements InventoryProvider, RuntimeComp
         if (stack == null || stack.isEmpty()) return false;
         if (this.activeRequest != null && !this.activeRequest.acceptsStack(stack)) return false;
         return this.exactMatch
-                ? ItemStack.isSameItemSameComponents(stack, this.requestedStack)
+                ? ContainerSyncPlan.same(stack, this.requestedStack)
                 : this.requestedItems.contains(stack.getItem());
     }
 
@@ -822,7 +824,7 @@ public final class ChestTrackerAdapter implements InventoryProvider, RuntimeComp
             if (memory == null || memory.container().isEmpty()
                     || !this.selectedContainers.contains(world, dimension, pos)
                     || this.client.level == null || !this.client.level.isLoaded(pos)) continue;
-            double distance = this.client.player == null ? 0.0D : this.client.player.distanceToSqr(Vec3.atCenterOf(pos));
+            double distance = this.client.player == null ? 0.0D : this.client.player.distanceToSqr(Vec3Utils.atCenterOf(pos));
             long timestamp = memory.inGameTimestamp() == null ? Long.MIN_VALUE : memory.inGameTimestamp();
             for (Item requested : this.requestedItems) {
                 if (candidateCount >= MAX_SCAN_CANDIDATES) break;

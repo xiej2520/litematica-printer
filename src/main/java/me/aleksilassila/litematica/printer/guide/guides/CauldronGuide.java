@@ -67,7 +67,11 @@ public class CauldronGuide extends Guide {
     }
 
     private Result buildWaterFillAction(int requiredLevel) {
+        //#if MC >= 11700
         if (requiredLevel == LayeredCauldronBlock.MAX_FILL_LEVEL
+        //#else
+        //$$ if (requiredLevel == 3
+        //#endif
                 && InventoryUtils.playerHasItemInInventory(client.player, Items.WATER_BUCKET)) {
             return Result.success(new ClickAction().setItem(Items.WATER_BUCKET));
         }
@@ -82,7 +86,11 @@ public class CauldronGuide extends Guide {
                     .setRequiredStackPredicate(PotionStackUtils::isWaterPotion)
                     .setRequiredCreativeStack(waterPotion));
         }
+        //#if MC >= 11700
         if (requiredLevel == LayeredCauldronBlock.MAX_FILL_LEVEL) {
+        //#else
+        //$$ if (requiredLevel == 3) {
+        //#endif
             InventoryUtils.playerHasAccessToItem(client.player, Items.WATER_BUCKET);
         }
         return Result.SKIP;

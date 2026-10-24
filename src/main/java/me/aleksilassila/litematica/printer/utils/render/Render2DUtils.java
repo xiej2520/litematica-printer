@@ -2,7 +2,9 @@ package me.aleksilassila.litematica.printer.utils.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+//#if MC >= 11802
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+//#endif
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
@@ -29,7 +31,9 @@ import java.awt.*;
 public class Render2DUtils {
     public static final Minecraft client = Minecraft.getInstance();
     private static PoseStack poseStack;
+    //#if MC >= 11802
     private static GuiGraphicsExtractor guiGraphics;
+    //#endif
 
     // ==================== 初始化 ====================
 
@@ -37,9 +41,11 @@ public class Render2DUtils {
         Render2DUtils.poseStack = poseStack;
     }
 
+    //#if MC >= 11802
     public static void initGuiGraphics(GuiGraphicsExtractor guiGraphics) {
         Render2DUtils.guiGraphics = guiGraphics;
     }
+    //#endif
 
     public static void ensureInitialized() {
         //#if MC > 11904
@@ -67,12 +73,15 @@ public class Render2DUtils {
 
         //#if MC > 11904
         guiGraphics.text(client.font, text, x, y, color.getRGB(), withShadow);
-        //#else
+        //#elseif MC >= 11600
         //$$ if (withShadow) {
         //$$    client.font.drawShadow(poseStack, text, x, y, color.getRGB());
         //$$ } else {
         //$$    client.font.draw(poseStack, text, x, y, color.getRGB());
         //$$ }
+        //#else
+        //$$ if (withShadow) client.font.drawShadow(text, x, y, color.getRGB());
+        //$$ else client.font.draw(text, x, y, color.getRGB());
         //#endif
     }
 
@@ -80,8 +89,10 @@ public class Render2DUtils {
         ensureInitialized();
         //#if MC > 11904
         guiGraphics.fill(x1, y1, x2, y2, color.getRGB());
-        //#else
+        //#elseif MC >= 11600
         //$$ GuiComponent.fill(poseStack, x1, y1, x2, y2, color.getRGB());
+        //#else
+        //$$ GuiComponent.fill(x1, y1, x2, y2, color.getRGB());
         //#endif
     }
 
@@ -104,8 +115,10 @@ public class Render2DUtils {
         guiGraphics.pose().pushMatrix();
         //#elseif MC > 11904
         //$$ guiGraphics.pose().pushPose();
-        //#else
+        //#elseif MC >= 11600
         //$$ poseStack.pushPose();
+        //#else
+        //$$ RenderSystem.pushMatrix();
         //#endif
     }
 
@@ -115,8 +128,10 @@ public class Render2DUtils {
         guiGraphics.pose().popMatrix();
         //#elseif MC > 11904
         //$$ guiGraphics.pose().popPose();
-        //#else
+        //#elseif MC >= 11600
         //$$ poseStack.popPose();
+        //#else
+        //$$ RenderSystem.popMatrix();
         //#endif
     }
 
@@ -126,8 +141,10 @@ public class Render2DUtils {
         guiGraphics.pose().translate((float) x, (float) y);
         //#elseif MC > 11904
         //$$ guiGraphics.pose().translate((float) x, (float) y, (float) z);
-        //#else
+        //#elseif MC >= 11600
         //$$ poseStack.translate(x, y, z);
+        //#else
+        //$$ RenderSystem.translated(x, y, z);
         //#endif
     }
 
@@ -137,8 +154,10 @@ public class Render2DUtils {
         guiGraphics.pose().scale(x, y);
         //#elseif MC > 11904
         //$$ guiGraphics.pose().scale(x, y, z);
-        //#else
+        //#elseif MC >= 11600
         //$$ poseStack.scale(x, y, z);
+        //#else
+        //$$ RenderSystem.scalef(x, y, z);
         //#endif
     }
 
@@ -181,9 +200,12 @@ public class Render2DUtils {
         //$$ );
         //#elseif MC > 11904
         //$$ guiGraphics.blit(texture, x, y, (float) u, (float) v, regionWidth, regionHeight, textureWidth, textureHeight);
-        //#else
+        //#elseif MC >= 11600
         //$$ RenderSystem.setShaderTexture(0, texture);
         //$$ GuiComponent.blit(poseStack, x, y, u, v, regionWidth, regionHeight, textureWidth, textureHeight);
+        //#else
+        //$$ client.getTextureManager().bind(texture);
+        //$$ GuiComponent.blit(x, y, u, v, regionWidth, regionHeight, textureWidth, textureHeight);
         //#endif
     }
 

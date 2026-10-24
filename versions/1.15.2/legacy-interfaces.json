@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "id": "litematica-printer",
+  "version": "1.15.2",
+  "custom": {
+    "loom:injected_interfaces": {
+      "net/minecraft/class_2680": [
+        "me/aleksilassila/litematica/printer/compat/legacy/LegacyApi$BlockStateApi"
+      ],
+      "net/minecraft/class_2248": [
+        "me/aleksilassila/litematica/printer/compat/legacy/LegacyApi$BlockApi"
+      ],
+      "net/minecraft/class_1799": [
+        "me/aleksilassila/litematica/printer/compat/legacy/LegacyApi$ItemStackApi"
+      ],
+      "net/minecraft/class_1297": [
+        "me/aleksilassila/litematica/printer/compat/legacy/LegacyApi$EntityApi"
+      ],
+      "net/minecraft/class_1657": [
+        "me/aleksilassila/litematica/printer/compat/legacy/LegacyApi$PlayerApi"
+      ],
+      "net/minecraft/class_1703": [
+        "me/aleksilassila/litematica/printer/compat/legacy/LegacyApi$ContainerMenuApi"
+      ],
+      "net/minecraft/class_1735": [
+        "me/aleksilassila/litematica/printer/compat/legacy/LegacyApi$SlotApi"
+      ],
+      "net/minecraft/class_1937": [
+        "me/aleksilassila/litematica/printer/compat/legacy/LegacyApi$LevelApi"
+      ],
+      "net/minecraft/class_2874": [
+        "me/aleksilassila/litematica/printer/compat/legacy/LegacyApi$DimensionTypeApi"
+      ],
+      "net/minecraft/class_2826": [
+        "me/aleksilassila/litematica/printer/compat/legacy/LegacyApi$LevelChunkSectionApi"
+      ],
+      "net/minecraft/class_2350$class_2353": [
+        "me/aleksilassila/litematica/printer/compat/legacy/LegacyApi$PlaneApi"
+      ]
+    }
+  }
+}
