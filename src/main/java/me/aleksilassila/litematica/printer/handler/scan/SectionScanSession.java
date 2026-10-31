@@ -432,6 +432,14 @@ final class SectionScanSession {
         boolean acceptedByFlags(ScanIntent intent) {
             return intent.acceptsByFlags(this.flags);
         }
+
+        //#if MC < 11802
+        //$$ // JvmDowngrader's generated toString calls StringBuilder.append(byte), which does not exist.
+        //$$ @Override
+        //$$ public String toString() {
+        //$$     return "Candidate[pos=" + this.pos + ", flags=" + this.flags + "]";
+        //$$ }
+        //#endif
     }
 
     /** Reuse the active burst's table; release its peak capacity on pass reset or close. */
