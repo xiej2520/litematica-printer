@@ -140,7 +140,7 @@ public final class WaterPrintTask implements PrintTask {
         if (!InteractionUtils.canBreakBlock(context.blockPos)) {
             return PrintTaskBuildResult.SKIP;
         }
-        if (ice && !IceBreakToolSelector.switchToNonSilkTouchBreakItem(context.client)) {
+        if (ice && !IceBreakToolSelector.switchToNonSilkTouchBreakItem(context.client, context.blockPos)) {
             return PrintTaskBuildResult.SKIP;
         }
 

@@ -150,6 +150,10 @@ public abstract class MixinMultiPlayerGameMode implements MultiPlayerGameModeExt
         return RuntimeAccess.get().inventorySwitchGuard().isWaiting();
     }
     @Override public void ensureCarriedItemSent() { this.ensureHasSentCarriedItem(); }
+    @Override public void onPendingDestroyExpired(BlockPos pos) {
+        // This branch's scan engine has no per-owner reoffer; marking the position dirty returns it to the scan.
+        RuntimeAccess.get().scanEngine().invalidate(pos);
+    }
 
     @Override
     public ServerboundPlayerActionPacket actionPacket(
