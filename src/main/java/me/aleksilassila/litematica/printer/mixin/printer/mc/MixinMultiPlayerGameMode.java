@@ -46,6 +46,11 @@ public abstract class MixinMultiPlayerGameMode implements MultiPlayerGameModeExt
     //#else
     //$$ @Shadow public abstract InteractionResult useItemOn(LocalPlayer player, ClientLevel level, InteractionHand hand, BlockHitResult hit);
     //#endif
+    //#if MC > 11802
+    @Shadow public abstract InteractionResult useItem(net.minecraft.world.entity.player.Player player, InteractionHand hand);
+    //#else
+    //$$ @Shadow public abstract InteractionResult useItem(net.minecraft.world.entity.player.Player player, net.minecraft.world.level.Level level, InteractionHand hand);
+    //#endif
 
     @Unique
     private MiningInteractionController litematica_printer$controller() {
@@ -109,6 +114,26 @@ public abstract class MixinMultiPlayerGameMode implements MultiPlayerGameModeExt
         //$$ NetworkUtils.sendPacket(sequence -> new ServerboundUseItemOnPacket(hand, hit));
         //#endif
         return InteractionResult.PASS;
+    }
+
+    @Override public InteractionResult litematica_printer$useItem(InteractionHand hand,
+            me.aleksilassila.litematica.printer.printer.PlayerLook look) {
+        LocalPlayer player = this.minecraft.player;
+        if (player == null || look == null) return InteractionResult.FAIL;
+        float yaw = player.getYRot();
+        float pitch = player.getXRot();
+        try {
+            player.setYRot(look.yaw);
+            player.setXRot(look.pitch);
+            //#if MC > 11802
+            return this.useItem(player, hand);
+            //#else
+            //$$ return this.useItem(player, player.level, hand);
+            //#endif
+        } finally {
+            player.setYRot(yaw);
+            player.setXRot(pitch);
+        }
     }
 
     @Override public Minecraft client() { return this.minecraft; }
