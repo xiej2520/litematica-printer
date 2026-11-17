@@ -398,13 +398,13 @@ public class MineHandler extends FeatureModuleBase {
             if (!this.toolSession.hasInstantBudget()) {
                 break;
             }
-            if (!this.toolSession.matchesSessionTool(this.analyzer, queuedTarget)) {
-                continue;
-            }
+            boolean switchTool = !this.toolSession.matchesSessionTool(this.analyzer, queuedTarget);
             if (!this.toolSession.ensureHandToolProtected(this.player, queuedTarget)) {
                 break;
             }
-            result = this.executeSessionTarget(queuedTarget, false);
+            // Prepare the next construction rank now; the controller retains any switch wait.
+            if (switchTool) this.toolSession.startSession(queuedTarget);
+            result = this.executeSessionTarget(queuedTarget, switchTool);
             if (this.toolSession.shouldStop(result, this.activeMinePos != null)) {
                 break;
             }
