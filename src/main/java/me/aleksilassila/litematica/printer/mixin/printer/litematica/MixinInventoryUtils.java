@@ -6,6 +6,7 @@ import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import me.aleksilassila.litematica.printer.integration.inventory.PickBlockRequestScope;
+import me.aleksilassila.litematica.printer.utils.mods.QuickCraftUtils;
 import me.aleksilassila.litematica.printer.utils.mods.QuickShulkerBridge;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -42,11 +43,12 @@ public class MixinInventoryUtils {
         //#else
         //$$ double range = fi.dy.masa.litematica.config.Configs.Generic.EASY_PLACE_VANILLA_REACH.getBooleanValue() ? 4.5D : 6.0D;
         //#endif
+        var traceEntity = QuickCraftUtils.easyPlaceTraceEntity(mc);
         boolean first = fi.dy.masa.litematica.config.Configs.Generic.EASY_PLACE_FIRST.getBooleanValue();
         var trace = first
-                ? RayTraceUtils.getGenericTrace(mc.level, mc.player, range, true,
+                ? RayTraceUtils.getGenericTrace(mc.level, traceEntity, range, true,
                         fi.dy.masa.litematica.config.Configs.InfoOverlays.INFO_OVERLAYS_TARGET_FLUIDS.getBooleanValue(), false)
-                : RayTraceUtils.getFurthestSchematicWorldTraceBeforeVanilla(mc.level, mc.player, range);
+                : RayTraceUtils.getFurthestSchematicWorldTraceBeforeVanilla(mc.level, traceEntity, range);
         if (trace == null) {
             boolean restricted = false;
             //#if MC >= 11904
@@ -75,7 +77,7 @@ public class MixinInventoryUtils {
             return;
         }
         BlockState actual = mc.level.getBlockState(pos);
-        HitResult vanillaHit = RayTraceUtils.getRayTraceFromEntity(mc.level, mc.player, false, range);
+        HitResult vanillaHit = RayTraceUtils.getRayTraceFromEntity(mc.level, traceEntity, false, range);
         //#if MC >= 260200
         //$$ boolean blocked = expected == actual || EasyPlaceUtilsAccessor.callEasyPlaceBlockChecksCancel(expected, actual, mc.player, vanillaHit, stack);
         //#else
