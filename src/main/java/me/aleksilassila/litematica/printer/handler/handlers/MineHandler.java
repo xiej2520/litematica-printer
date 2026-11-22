@@ -30,6 +30,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -248,7 +249,7 @@ public class MineHandler extends FeatureModuleBase {
                     && this.isFluid(this.level.getBlockState(pos));
         }
         if (this.hasTrenchFillWork() && this.trenchFill.hasWaterloggedTarget(pos)) {
-            return this.level != null && this.isWaterlogged(this.level.getBlockState(pos));
+            return this.level != null && this.isTrenchBreakTarget(pos, this.level.getBlockState(pos));
         }
         return this.isMineScanCandidate(pos, true);
     }
@@ -342,7 +343,7 @@ public class MineHandler extends FeatureModuleBase {
         return pos != null
                 && (this.isInSelectionRange(pos)
                     || Configs.Mine.MINE_TRENCH_MODE.getBooleanValue()
-                        && this.isWaterlogged(this.level.getBlockState(pos)) && this.isWithinTrenchScope(pos))
+                        && this.isTrenchBreakTarget(pos, this.level.getBlockState(pos)) && this.isWithinTrenchScope(pos))
                 && this.canReachIterationPosition(pos)
                 && InteractionUtils.canBreakBlock(pos)
                 && mineRestriction(this.level.getBlockState(pos));
@@ -587,7 +588,7 @@ public class MineHandler extends FeatureModuleBase {
 
     private void executeTrenchWaterloggedBreak(BlockPos pos, AtomicReference<Boolean> skipIteration) {
         if (this.level == null || !this.isWithinTrenchScope(pos)
-                || !this.isWaterlogged(this.level.getBlockState(pos))) {
+                || !this.isTrenchBreakTarget(pos, this.level.getBlockState(pos))) {
             this.trenchFill.removeWaterloggedTarget(pos);
             return;
         }
@@ -622,7 +623,7 @@ public class MineHandler extends FeatureModuleBase {
                     BlockState state = this.level.getBlockState(pos);
                     if (this.isFluid(state)) {
                         discovered.add(pos.immutable());
-                    } else if (this.isWaterlogged(state)) {
+                    } else if (this.isTrenchBreakTarget(pos, state)) {
                         waterlogged.add(pos.immutable());
                     }
                     for (Direction side : TRENCH_BOUNDARY_SIDES) {
@@ -631,7 +632,7 @@ public class MineHandler extends FeatureModuleBase {
                             BlockState outsideState = this.level.getBlockState(outside);
                             if (this.isFluid(outsideState)) {
                                 discovered.add(outside.immutable());
-                            } else if (this.isWaterlogged(outsideState)) {
+                            } else if (this.isTrenchBreakTarget(outside, outsideState)) {
                                 waterlogged.add(outside.immutable());
                             }
                         }
@@ -692,10 +693,10 @@ public class MineHandler extends FeatureModuleBase {
             Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST, Direction.DOWN
     };
 
-    private boolean isWaterlogged(BlockState state) {
-        return state != null
-                && !(state.getBlock() instanceof LiquidBlock)
-                && !state.getFluidState().isEmpty();
+    private boolean isTrenchBreakTarget(BlockPos pos, BlockState state) {
+        if (state == null || state.getBlock() instanceof LiquidBlock) return false;
+        return !state.getFluidState().isEmpty()
+                || (state.is(Blocks.BUDDING_AMETHYST) && !this.isInSelectionRange(pos));
     }
 
 }
