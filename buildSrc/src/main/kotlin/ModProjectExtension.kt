@@ -102,6 +102,12 @@ val Project.placeholderProps: Map<String, Any?>
         } else {
             ""
         },
+        // The Efficiency attribute exists since 1.21.
+        "mining_efficiency_client_mixins" to if (mcVersionInt >= 12100) {
+            "\"printer.mc.MixinPlayerMiningEfficiency\","
+        } else {
+            ""
+        },
         "chesttracker_client_mixins" to if (mcVersionInt >= 12104) {
             "\"printer.chesttracker.ItemListWidgetAccessor\",\n" +
                     "    \"printer.chesttracker.ItemListWidgetMixin\","
