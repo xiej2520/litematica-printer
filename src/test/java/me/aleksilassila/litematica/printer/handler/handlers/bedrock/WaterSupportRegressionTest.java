@@ -96,10 +96,68 @@ public class WaterSupportRegressionTest {
         }
     }
 
+    @Test void unsupportedWaterloggedTargetPrintsNormallyWithoutKeepingAWaterTask() throws Exception {
+        try (var f = new WaterFixture()) {
+            f.level.blocks.put(POS.below(), Blocks.AIR.defaultBlockState());
+            f.level.blocks.put(POS.east(), Blocks.STONE.defaultBlockState());
+
+            assertSame(PrintTaskBuildResult.PASS, f.build(POS),
+                    "Missing ice-water support must not prevent ordinary placement of the slab itself");
+            var action = new me.aleksilassila.litematica.printer.guide.Guides()
+                    .buildAction(f.context(POS)).orElseThrow();
+            assertNotNull(action.getValidSide(f.level, POS));
+            assertNull(f.workflows.createActionHandle(f.context(POS), action),
+                    "Placing the dry body is ordinary placement, not a completed water stage");
+            assertFalse(f.workflows.hasActiveWorkflow(), "Impossible ice placement must not leave a pending water task");
+
+            f.level.blocks.put(POS, Blocks.OAK_SLAB.defaultBlockState());
+            for (long tick : new long[]{1, 20, 100}) {
+                f.now = tick;
+                f.workflows.tick(f.level, f.schematic);
+                assertSame(PrintTaskBuildResult.PASS, f.build(POS));
+                assertFalse(f.workflows.isActiveTaskPos(POS));
+                assertFalse(f.workflows.hasReadyWorkflow());
+                assertTrue(f.mining.requests.isEmpty(), "Do not repeatedly dismantle a body that cannot be filled yet");
+            }
+
+            f.workflows.resetWorkflows();
+            f.level.blocks.put(POS.below(), Blocks.STONE.defaultBlockState());
+            f.workflows.wake(POS.below());
+            f.workflows.tick(f.level, f.schematic);
+            assertSame(PrintTaskBuildResult.PASS, f.build(POS));
+            assertTrue(f.mining.requests.isEmpty(),
+                    "Later support must not restart automatic water or dismantle the player's dry block");
+        }
+    }
+
+    @Test void changingTheRequiredTargetAllowsAutomaticWaterAgain() throws Exception {
+        try (var f = new WaterFixture()) {
+            f.level.blocks.put(POS.below(), Blocks.AIR.defaultBlockState());
+            assertSame(PrintTaskBuildResult.PASS, f.build(POS));
+
+            f.schematic.states.put(POS, Blocks.WATER.defaultBlockState());
+            f.level.blocks.put(POS.below(), Blocks.STONE.defaultBlockState());
+            assertIceAction(f.build(POS));
+        }
+    }
+
+    @Test void aNewSchematicDoesNotInheritTheManualWaterDecision() throws Exception {
+        try (var f = new WaterFixture()) {
+            f.level.blocks.put(POS.below(), Blocks.AIR.defaultBlockState());
+            assertSame(PrintTaskBuildResult.PASS, f.build(POS));
+
+            var replacement = f.allocate(Schematic.class);
+            replacement.states = new HashMap<>(f.schematic.states);
+            f.level.blocks.put(POS.below(), Blocks.STONE.defaultBlockState());
+            assertIceAction(f.workflows.buildAction(new SchematicBlockContext(f.client, f.level, replacement, POS)));
+        }
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {"scaffolding", "waterlogged_scaffolding", "air"})
-    void unsupportedTargetNeverQueuesIceAndWaitsOutsideReadyQueue(String support) throws Exception {
+    void unsupportedWaterIsSkippedWithoutKeepingATask(String support) throws Exception {
         try (var f = new WaterFixture()) {
+            f.schematic.states.put(POS, Blocks.WATER.defaultBlockState());
             f.level.blocks.put(POS.below(), switch (support) {
                 case "scaffolding" -> Blocks.SCAFFOLDING.defaultBlockState();
                 case "waterlogged_scaffolding" -> Blocks.SCAFFOLDING.defaultBlockState()
@@ -111,7 +169,7 @@ public class WaterSupportRegressionTest {
                 f.now = tick;
                 assertSame(PrintTaskBuildResult.SKIP, f.build(POS));
                 f.workflows.tick(f.level, f.schematic);
-                assertTrue(f.workflows.isActiveTaskPos(POS));
+                assertFalse(f.workflows.isActiveTaskPos(POS));
                 assertFalse(f.workflows.hasReadyWorkflow(), "An unsupported target must not monopolize ready work");
             }
             assertTrue(f.mining.requests.isEmpty());
@@ -137,25 +195,26 @@ public class WaterSupportRegressionTest {
         }
     }
 
-    @Test void dryFinalBlockIsPreservedUntilIceCanLeaveWater() throws Exception {
+    @Test void dryFinalBlockWithoutSupportIsLeftForManualWater() throws Exception {
         try (var f = new WaterFixture()) {
             f.level.blocks.put(POS, Blocks.OAK_SLAB.defaultBlockState());
             f.level.blocks.put(POS.below(), Blocks.SCAFFOLDING.defaultBlockState());
 
-            assertSame(PrintTaskBuildResult.SKIP, f.build(POS));
+            assertSame(PrintTaskBuildResult.PASS, f.build(POS));
 
             assertTrue(f.mining.requests.isEmpty(), "Do not destroy the final block to begin an impossible workflow");
             assertFalse(f.workflows.hasReadyWorkflow());
             f.level.blocks.put(POS.below(), Blocks.STONE.defaultBlockState());
             f.workflows.wake(POS.below());
             f.workflows.tick(f.level, f.schematic);
-            f.build(POS);
-            assertEquals(List.of(POS), f.mining.requests);
+            assertSame(PrintTaskBuildResult.PASS, f.build(POS));
+            assertTrue(f.mining.requests.isEmpty());
         }
     }
 
     @Test void evaporatingEnvironmentDoesNotConsumeIceOnSolidSupport() throws Exception {
         try (var f = new WaterFixture()) {
+            f.schematic.states.put(POS, Blocks.WATER.defaultBlockState());
             f.environment(true);
 
             assertSame(PrintTaskBuildResult.SKIP, f.build(POS));
@@ -164,38 +223,38 @@ public class WaterSupportRegressionTest {
         }
     }
 
-    @Test void supportUpdateWakesOnlyTheAffectedWaitingTarget() throws Exception {
+    @Test void supportUpdateDoesNotReopenManualWaterTargets() throws Exception {
         try (var f = new WaterFixture()) {
             BlockPos other = POS.east(5);
             f.schematic.states.put(other, f.required);
             f.level.blocks.put(POS.below(), Blocks.SCAFFOLDING.defaultBlockState());
             f.level.blocks.put(other.below(), Blocks.SCAFFOLDING.defaultBlockState());
-            assertSame(PrintTaskBuildResult.SKIP, f.build(POS));
-            assertSame(PrintTaskBuildResult.SKIP, f.build(other));
+            assertSame(PrintTaskBuildResult.PASS, f.build(POS));
+            assertSame(PrintTaskBuildResult.PASS, f.build(other));
             f.workflows.tick(f.level, f.schematic);
 
             f.level.blocks.put(POS.below(), Blocks.STONE.defaultBlockState());
             f.workflows.wake(POS.below());
             f.workflows.tick(f.level, f.schematic);
 
-            assertEquals(List.of(POS), f.workflows.readyTargetPositions());
-            assertTrue(f.workflows.isActiveTaskPos(other));
-            assertIceAction(f.build(POS));
+            assertTrue(f.workflows.readyTargetPositions().isEmpty());
+            assertFalse(f.workflows.hasActiveWorkflow());
+            assertSame(PrintTaskBuildResult.PASS, f.build(POS));
         }
     }
 
-    @Test void supportIsRecheckedWithoutReceivingANeighbourPacket() throws Exception {
+    @Test void fallbackPollingDoesNotReopenManualWaterTargets() throws Exception {
         try (var f = new WaterFixture()) {
             f.level.blocks.put(POS.below(), Blocks.AIR.defaultBlockState());
-            assertSame(PrintTaskBuildResult.SKIP, f.build(POS));
+            assertSame(PrintTaskBuildResult.PASS, f.build(POS));
             assertFalse(f.workflows.hasReadyWorkflow());
 
             f.level.blocks.put(POS.below(), Blocks.STONE.defaultBlockState());
             f.now = 5;
             f.workflows.tick(f.level, f.schematic);
 
-            assertEquals(List.of(POS), f.workflows.readyTargetPositions());
-            assertIceAction(f.build(POS));
+            assertTrue(f.workflows.readyTargetPositions().isEmpty());
+            assertSame(PrintTaskBuildResult.PASS, f.build(POS));
         }
     }
 
@@ -259,16 +318,14 @@ public class WaterSupportRegressionTest {
     //#if MC >= 260300
     //$$ @Test void supportRuleFollowsTheIceMeltingTag() throws Exception {
     //$$     try (var f = new WaterFixture()) {
+    //$$         f.schematic.states.put(POS, Blocks.WATER.defaultBlockState());
     //$$         f.bindTags(f.stone, List.of());
     //$$         assertSame(PrintTaskBuildResult.SKIP, f.build(POS));
     //$$         assertFalse(f.workflows.hasReadyWorkflow());
     //$$
+    //$$         f.workflows.clear(); // Evaluate a fresh target independently of the manual-water decision above.
     //$$         f.bindTags(f.scaffolding, List.of(BlockTags.ICE_MELTS_WHEN_DESTROYED_ABOVE));
     //$$         f.level.blocks.put(POS.below(), Blocks.SCAFFOLDING.defaultBlockState());
-    //$$         f.workflows.wake(POS.below());
-    //$$         f.workflows.tick(f.level, f.schematic);
-    //$$
-    //$$         assertEquals(List.of(POS), f.workflows.readyTargetPositions());
     //$$         assertIceAction(f.build(POS));
     //$$     }
     //$$ }
