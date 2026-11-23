@@ -144,8 +144,12 @@ public class Action {
         return this;
     }
 
-    @SuppressWarnings("SequencedCollectionMethodCanBeUsed")
     public @Nullable Direction getValidSide(ClientLevel world, BlockPos pos) {
+        return getValidSide(world, pos, null);
+    }
+
+    @SuppressWarnings("SequencedCollectionMethodCanBeUsed")
+    public @Nullable Direction getValidSide(ClientLevel world, BlockPos pos, @Nullable LocalPlayer reachFrom) {
         List<Direction> orderedSides = getOrderedSides();
         if (Configs.Print.PLACE_IN_AIR.getBooleanValue() && !this.requiresSupport) {
             return orderedSides.isEmpty() ? null : orderedSides.get(0);
@@ -157,6 +161,11 @@ public class Action {
         BlockState currentState = world.getBlockState(pos);
         for (Direction side : orderedSides) {
             BlockPos neighborPos = pos.relative(side);
+            //#if MC >= 12005
+            if (reachFrom != null && !reachFrom.isWithinBlockInteractionRange(neighborPos, 1.0)) continue;
+            //#else
+            //$$ if (reachFrom != null && !me.aleksilassila.litematica.printer.utils.minecraft.PlayerUtils.isWithinBlockInteractionRange(reachFrom, neighborPos, 1.0)) continue;
+            //#endif
             BlockState neighborState = world.getBlockState(neighborPos);
             if (PrinterUtils.canBeClicked(world, neighborPos) && !BlockUtils.isReplaceable(neighborState)) {
                 if (firstValidSide == null) {

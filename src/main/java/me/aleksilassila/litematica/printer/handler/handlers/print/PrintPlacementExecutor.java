@@ -37,6 +37,7 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
 import net.minecraft.world.item.ItemStack;
 
@@ -87,16 +88,20 @@ public final class PrintPlacementExecutor {
             }
         }
 
-        Direction side = action.getValidSide(context.level, blockPos);
+        boolean checkIceSupportReach = taskAction instanceof WaterPrintTask.IcePlacement
+                && Configs.Core.CHECK_PLAYER_INTERACTION_RANGE.getBooleanValue();
+        Direction side = checkIceSupportReach
+                ? action.getValidSide(context.level, blockPos, context.client.player)
+                : action.getValidSide(context.level, blockPos);
         if (side == null) {
             this.hudStats.recordDeferred(HudStatsManager.Mode.PRINT, HudStatus.NO_VALID_FACE);
-            return PrintPlacementResult.failure(false, shouldStopAfterTaskAction(taskAction));
+            // A missing neighbour blocks only this position. Other targets can still place this tick.
+            return PrintPlacementResult.failure(false, false);
         }
 
         Item[] requiredItems = normalizeRequiredItems(action.getRequiredItems(context.requiredState.getBlock()));
         Predicate<ItemStack> requiredStackPredicate = action.getRequiredStackPredicate();
         Vec3 hitModifier = this.litematica.usePrecisionPlacement(blockPos, context.requiredState);
-        boolean warehousePlace = false;
         //#if MC >= 12111
         boolean warehouseEligible = VoidWarehousePlacementPolicy.supports(action, requiredItems, hitModifier);
         if (warehouseEligible && VoidWarehousePlacementNetwork.isNegotiating()) {
@@ -106,12 +111,16 @@ public final class PrintPlacementExecutor {
         }
         boolean warehouseSupported = warehouseEligible && VoidWarehousePlacementNetwork.isAvailable()
                 && (hitModifier == null || VoidWarehousePlacementNetwork.isStatePlacementSupported());
-        boolean warehouseTargetAvailable = warehouseSupported && VoidWarehousePlacementNetwork.isTargetAvailable(blockPos);
+        int rejectedIceNonce = warehouseSupported && taskAction instanceof WaterPrintTask.FinalPlacement placement
+                && requiredItems.length == 1 && requiredItems[0] == context.requiredState.getBlock().asItem()
+                ? placement.rejectedIceNonce(context) : 0;
+        boolean warehouseTargetAvailable = warehouseSupported
+                && VoidWarehousePlacementNetwork.isTargetAvailable(blockPos, rejectedIceNonce);
         VoidWarehousePlacementPolicy.Route warehouseRoute = VoidWarehousePlacementPolicy.route(
                 warehouseSupported,
                 warehouseSupported && VoidWarehousePlacementNetwork.isMaterialAvailable(requiredItems),
                 warehouseTargetAvailable,
-                warehouseSupported && VoidWarehousePlacementNetwork.canRequest(requiredItems, blockPos));
+                warehouseSupported && VoidWarehousePlacementNetwork.canRequest(requiredItems, blockPos, rejectedIceNonce));
         if (warehouseRoute == VoidWarehousePlacementPolicy.Route.MATERIAL_UNAVAILABLE) {
             if (!VoidWarehousePlacementNetwork.canUseInventoryFallback(blockPos)) {
                 warehouseRoute = VoidWarehousePlacementPolicy.Route.WAIT;
@@ -133,7 +142,19 @@ public final class PrintPlacementExecutor {
             this.hudStats.recordDeferred(HudStatsManager.Mode.PRINT, HudStatus.WAITING_RETRIEVAL);
             return PrintPlacementResult.deferred(false);
         }
-        warehousePlace = warehouseRoute == VoidWarehousePlacementPolicy.Route.DIRECT;
+        boolean warehousePlace = warehouseRoute == VoidWarehousePlacementPolicy.Route.DIRECT;
+        //#else
+        //$$ // No void warehouse before 1.21.11.
+        //$$ boolean warehousePlace = false;
+        //$$ int rejectedIceNonce = 0;
+        //#endif
+        BooleanSupplier collisionFree = WaterPrintTask.collisionCheck(
+                taskAction, context, action, side, requiredItems, hitModifier, warehousePlace);
+        if (collisionFree != null && !collisionFree.getAsBoolean()) {
+            this.hudStats.recordDeferred(HudStatsManager.Mode.PRINT, HudStatus.PLACEMENT_NOT_SENT);
+            return PrintPlacementResult.deferred(false);
+        }
+        //#if MC >= 12111
         if (warehouseRoute == VoidWarehousePlacementPolicy.Route.INVENTORY) {
             VoidWarehousePlacementNetwork.recordInventoryFallback(requiredItems, blockPos,
                     action.getClass().getSimpleName(), warehouseEligible, hitModifier != null);
@@ -235,6 +256,20 @@ public final class PrintPlacementExecutor {
             this.hudStats.recordDeferred(HudStatsManager.Mode.PRINT, HudStatus.ACTION_QUEUE_BUSY);
             return PrintPlacementResult.cancelled(true);
         }
+        if (taskAction instanceof WaterPrintTask.IcePlacement ice
+                && !this.actionBroker.setQueueValidity(() ->
+                        this.litematica.schematicWorld() == context.schematic && ice.canSend(context)
+                        && collisionFree.getAsBoolean()
+                        //#if MC >= 12005
+                        && (!checkIceSupportReach || context.client.player.isWithinBlockInteractionRange(
+                                blockPos.relative(side), 1.0)))) {
+                        //#else
+                        //$$ && (!checkIceSupportReach || me.aleksilassila.litematica.printer.utils.minecraft.PlayerUtils.isWithinBlockInteractionRange(
+                        //$$         context.client.player, blockPos.relative(side), 1.0)))) {
+                        //#endif
+            this.actionBroker.cancelQueue();
+            return PrintPlacementResult.cancelled(false);
+        }
         this.actionBroker.setExpectedStackPredicate(requiredStackPredicate);
         //#if MC >= 12111
         if (warehousePlace && !(hitModifier == null
@@ -244,6 +279,15 @@ public final class PrintPlacementExecutor {
             return PrintPlacementResult.cancelled(false);
         }
         //#endif
+        if ((warehousePlace || collisionFree != null) && taskAction instanceof WaterPrintTask.FinalPlacement placement) {
+            // A queued stair still needs the same source and schematic when rotation finishes.
+            if ((rejectedIceNonce > 0 && !this.actionBroker.setWarehouseRejectedIceNonce(rejectedIceNonce))
+                    || !this.actionBroker.setQueueValidity(() -> this.litematica.schematicWorld() == context.schematic
+                            && placement.canSend(context) && (collisionFree == null || collisionFree.getAsBoolean()))) {
+                this.actionBroker.cancelQueue();
+                return PrintPlacementResult.cancelled(false);
+            }
+        }
         if (hitModifier != null) {
             this.actionBroker.useProtocolHitModifier(hitModifier);
         }
@@ -268,7 +312,7 @@ public final class PrintPlacementExecutor {
                 return;
             }
             if (sendResult.isSent()) {
-                this.recordPlacementSent(context, action, taskAction);
+                this.recordPlacementSent(context, action, taskAction, warehousePlace);
                 if (cooldownTicks > 0) {
                     this.cooldownUtils.setCooldown(
                             context.level,
@@ -319,7 +363,7 @@ public final class PrintPlacementExecutor {
             return PrintPlacementResult.cancelled(true);
         }
 
-        this.recordPlacementSent(context, action, taskAction);
+        this.recordPlacementSent(context, action, taskAction, warehousePlace);
 
         return new PrintPlacementResult(
                 consumedEffectiveExecution,
@@ -356,7 +400,8 @@ public final class PrintPlacementExecutor {
     private void recordPlacementSent(
             SchematicBlockContext context,
             Action action,
-            @Nullable PrintTaskAction taskAction
+            @Nullable PrintTaskAction taskAction,
+            boolean warehousePlace
     ) {
         if (context.requiredState.getBlock() instanceof SignBlock) {
             this.actionBroker.confirmPrintSignEditSent(context.blockPos);
@@ -366,8 +411,22 @@ public final class PrintPlacementExecutor {
                 context.blockPos,
                 taskAction == null
                         ? context.requiredState
-                        : taskAction.expectedBlockState(context, action)
+                        : taskAction.expectedBlockState(context, action),
+                taskAction
         );
+        //#if MC >= 12111
+        if (warehousePlace && taskAction instanceof WaterPrintTask.IcePlacement ice) {
+            ice.awaitWarehouseResult(VoidWarehousePlacementNetwork.onIceRequestRejected(context.blockPos, nonce -> {
+                this.hudStats.discardPrintPlacement(context.blockPos, ice);
+                ice.onRejected(context, nonce);
+            }));
+        } else if (warehousePlace && taskAction instanceof WaterPrintTask.FinalPlacement placement) {
+            VoidWarehousePlacementNetwork.onCurrentRequestRejected(context.blockPos, () -> {
+                this.hudStats.discardPrintPlacement(context.blockPos, placement);
+                placement.onRejected(context);
+            });
+        }
+        //#endif
         this.hudStats.recordRateUnit(HudStatsManager.Mode.PRINT, 1);
         this.hudStats.recordStatus(HudStatsManager.Mode.PRINT, HudStatus.RUNNING);
         if (context.requiredState.getBlock() instanceof FallingBlock) {
