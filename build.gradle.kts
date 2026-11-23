@@ -1,7 +1,7 @@
 plugins {
     id("maven-publish")
-    id("net.fabricmc.fabric-loom") version "1.17.20" apply false
-    id("net.fabricmc.fabric-loom-remap") version "1.17.20" apply false
+    id("net.fabricmc.fabric-loom") version "1.19.4" apply false
+    id("net.fabricmc.fabric-loom-remap") version "1.19.4" apply false
     id("xyz.wagyourtail.jvmdowngrader") version "2.0.1" apply false
 
     // https://github.com/ReplayMod/preprocessor

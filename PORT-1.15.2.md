@@ -10,16 +10,16 @@ native `fabric/1.15.2-xiej` line is a different API and is not a supported targe
 
 | Repository | Commit | Version |
 | --- | --- | --- |
-| malilib | `a60741e1526d78fe82c192e1783bfdf929e2c7ce` | `0.18.4+xiej.0` |
-| litematica | `04e4ef77459058be85f305d7d81595b4d668e1f6` | `0.9.1-1.15.2-dev+xiej.9` |
-| tweakeroo | `7a8dff7f4628723e2907f91ea4d622f2a9c748dc` | `0.20.999-sakura.13-1.15.2-xiej.8` |
-| quickshulker (`origin/1.15`) | `f3205640deb7afa477c674410dcd1a2e08df49b5` | `1.4.0+xiej.2` |
+| malilib | `33bd9383c3243a739bf6bce7ca56784c7f3c2a39` | `0.18.5+xiej` |
+| litematica | `7b2d0fe7ff76e4120b96cc0929a5a29624868fc3` | `0.9.1-1.15.2-dev+xiej.13` |
+| tweakeroo | `0252dcaaedad53c7b11e993634ffd55430ff665e` | `0.21.0-1.15.2-xiej.9` |
+| quickshulker (`origin/1.15`) | `f3205640deb7afa477c674410dcd1a2e08df49b5` | `1.4.0+xiej.3` |
 
 The 1.15.2 target resolves `fi.dy.masa` and `net.kyrptonaught` only from Maven
 local, so publish the forks there first (`publishToMavenLocal` in each fork).
 `tools/build-1.15.2-dependencies.sh` does that for the commits above, building
 them from the local checkouts (`masa/<mod>`, `../quickshulker`; `FORK_GRADLE` =
-Gradle 8.14.4, `JAVA_HOME` = Java 21). Pass `-Dmaven.repo.local=<dir>` to both
+Gradle 9.9.2, `JAVA_HOME` = Java 25; Loom 1.19 needs Gradle 9.8+ and Java 25). Pass `-Dmaven.repo.local=<dir>` to both
 to use another directory.
 
 ```sh
@@ -80,5 +80,5 @@ the client acknowledges the rejected one, about one round trip. The printer's tr
 click and wait for the reply. A click from another mod or the player in that window is dropped,
 and the resent menu reverts it on the client. Not observed in game.
 
-Checked headlessly on 2026-11-24 against Litematica `xiej.12` (the commit pinned above) with
+Checked headlessly on 2026-11-24 against Litematica `xiej.12` (the commit pinned then) with
 Schematic Preview, Tech Utils and TweakerMore installed: same result as the check above.</ai>

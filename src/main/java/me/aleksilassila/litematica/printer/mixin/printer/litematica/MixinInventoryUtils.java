@@ -38,7 +38,7 @@ public class MixinInventoryUtils {
         }
         // Match native Easy Place before requesting material. A schematic-only ray can hit an
         // already built block or a projection behind the real block the player is interacting with.
-        //#if MC > 12100
+        //#if MC > 12100 || MC < 11600
         double range = WorldUtils.getValidBlockRange(mc);
         //#else
         //$$ double range = fi.dy.masa.litematica.config.Configs.Generic.EASY_PLACE_VANILLA_REACH.getBooleanValue() ? 4.5D : 6.0D;
