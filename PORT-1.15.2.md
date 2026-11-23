@@ -11,7 +11,7 @@ native `fabric/1.15.2-xiej` line is a different API and is not a supported targe
 | Repository | Commit | Version |
 | --- | --- | --- |
 | malilib | `a60741e1526d78fe82c192e1783bfdf929e2c7ce` | `0.18.4+xiej.0` |
-| litematica | `6e953a0947dfbef92531f5f09e199d304845e6ca` | `0.9.1-1.15.2-dev+xiej.8` |
+| litematica | `04e4ef77459058be85f305d7d81595b4d668e1f6` | `0.9.1-1.15.2-dev+xiej.9` |
 | tweakeroo | `7a8dff7f4628723e2907f91ea4d622f2a9c748dc` | `0.20.999-sakura.13-1.15.2-xiej.8` |
 | quickshulker (`origin/1.15`) | `f3205640deb7afa477c674410dcd1a2e08df49b5` | `1.4.0+xiej.2` |
 

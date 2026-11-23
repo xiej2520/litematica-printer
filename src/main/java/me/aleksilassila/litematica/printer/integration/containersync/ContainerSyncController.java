@@ -288,12 +288,8 @@ public final class ContainerSyncController implements RuntimeComponent {
                 // Honour Litematica's protected hotbar; main inventory is the material pool.
                 return inventorySlot >= 9 && inventorySlot < 36
                         || inventorySlot >= 0 && inventorySlot < 9
-                        //#if MC >= 11802
                         && InventoryUtilsAccessor.getPICK_BLOCKABLE_SLOTS().contains(inventorySlot)
                         && InventoryUtilsAccessor.canPickToSlot(client.player.getInventory(), inventorySlot);
-                        //#else
-                        //$$ && InventoryUtilsAccessor.getPICK_BLOCKABLE_SLOTS().contains(inventorySlot + 1); // 1-based
-                        //#endif
             }
             public int capacity(int slot, ItemStack stack) {
                 var targetSlot = menu.getSlot(slot);

@@ -16,12 +16,10 @@ public interface InventoryUtilsAccessor {
         return -1;
     }
 
-    //#if MC >= 11802
     @Invoker("canPickToSlot")
     static boolean canPickToSlot(Inventory inventory, int slot) {
         return false;
     }
-    //#endif
 
     @Accessor(remap = false)
     static int getNextPickSlotIndex() {

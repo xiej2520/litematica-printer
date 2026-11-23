@@ -10,7 +10,7 @@ for mod in malilib litematica tweakeroo quickshulker; do
     repo=$masa_root/$mod
     case "$mod" in
         malilib) revision=a60741e1526d78fe82c192e1783bfdf929e2c7ce ;;
-        litematica) revision=6e953a0947dfbef92531f5f09e199d304845e6ca ;;
+        litematica) revision=04e4ef77459058be85f305d7d81595b4d668e1f6 ;;
         tweakeroo) revision=7a8dff7f4628723e2907f91ea4d622f2a9c748dc ;;
         quickshulker) revision=f3205640deb7afa477c674410dcd1a2e08df49b5; repo=$(dirname -- "$masa_root")/quickshulker ;;
     esac

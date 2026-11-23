@@ -288,13 +288,8 @@ public final class QuickShulkerRequestController {
                 try { hotbar = Integer.parseInt(configured.trim()) - 1; }
                 catch (NumberFormatException ignored) { continue; }
                 if (hotbar < 0 || hotbar >= 9) continue;
-                //#if MC >= 11802
                 if (!me.aleksilassila.litematica.printer.mixin.printer.litematica.InventoryUtilsAccessor
                         .canPickToSlot(player.getInventory(), hotbar)) continue;
-                //#else
-                //$$ if (!me.aleksilassila.litematica.printer.mixin.printer.litematica.InventoryUtilsAccessor
-                //$$         .getPICK_BLOCKABLE_SLOTS().contains(hotbar + 1)) continue;
-                //#endif
                 // Validate the final destination, not a configured slot which is subsequently replaced.
                 if (!QuickShulkerSupport.isSafeHotbarTarget(hotbar, sourceMenuSlot,
                         player.getInventory().getItem(hotbar))) continue;
